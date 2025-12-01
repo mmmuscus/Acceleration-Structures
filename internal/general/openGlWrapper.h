@@ -3,6 +3,8 @@
 
 #include "general.h"
 
+
+
 class openGlWrapper {
 private:
     unsigned int shaderProgram;
@@ -137,9 +139,25 @@ public:
     }
 
     void render() {
+        // Clear background (redundant cos we render a texture)
         glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.z);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // Change texture
+        unsigned char img[100][100][3];
+
+        for (int i = 0; i < 100; i++) {
+            for (int j = 0; j < 100; j++) {
+                img[i][j][0] = (unsigned char)255;
+                img[i][j][1] = (unsigned char)0;
+                img[i][j][2] = (unsigned char)0;
+            }
+        }
+
+        glBindTexture(GL_TEXTURE_2D, textureColorBuffer); // Was already bound
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 100, 100, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
+
+        // Render texture
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
