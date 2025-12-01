@@ -24,6 +24,7 @@ int main()
     // OpenGL
     openGlW.compileShaders();
     openGlW.createVertexBuffersAndAttributes();
+    openGlW.createScreenTexture();
 
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))
