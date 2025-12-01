@@ -9,14 +9,13 @@ class glfwWrapper {
 private:
     GLFWwindow* window;
     const char* glslVersion;
-    float mainScale;
 
     static void glfwErrorCallback(int error, const char* description) {
         fprintf(stderr, "GLFW Error %d: %s\n", error, description);
     }
 
 public:
-    glfwWrapper() : window(nullptr), glslVersion("#version 130"), mainScale(0.0f) {}
+    glfwWrapper() : window(nullptr), glslVersion("#version 130") {}
 
     void createGLFWContext() {
         glfwSetErrorCallback(glfwErrorCallback);
@@ -29,7 +28,6 @@ public:
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         // Create window with graphics context
-        mainScale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
         window = glfwCreateWindow((int)(WIDTH), (int)(HEIGHT), "Acceleration Structures", nullptr, nullptr);
         if (window == nullptr)
             return;
@@ -56,7 +54,6 @@ public:
     }
 
     const char* getGlslVersion() { return glslVersion; }
-    float getMainScale() { return mainScale; }
     GLFWwindow* getWindow() { return window; }
 
     ~glfwWrapper() {

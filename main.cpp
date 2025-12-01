@@ -21,20 +21,13 @@ int main()
 
     imGuiWrapper imGuiW = imGuiWrapper(io);
     imGuiW.createImGuiContext(
-        glfwW.getWindow(), glfwW.getMainScale(), glfwW.getGlslVersion()
+        glfwW.getWindow(), glfwW.getGlslVersion()
     );
 
     // OpenGL
     openGlW.compileShaders();
     openGlW.createVertexBuffersAndAttributes();
     openGlW.createScreenTexture();
-
-    for (int i = 0; i < 7; i++) {
-        for (int j = 0; j < 12; j++) {
-            std::cout << j / 2 << " ";
-        }
-        std::cout << std::endl;
-    }
 
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))

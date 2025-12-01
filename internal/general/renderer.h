@@ -9,13 +9,12 @@ private:
 
 public:
 	void createScreenTexture() {
-        for (int j = 0; j < HEIGHT; j++) {
-            for (int i = 0; i < WIDTH; i++) {
-                screenTexture[i][j][0] = (unsigned char)0;
-                screenTexture[i][j][0] = (unsigned char)(i * 255.0f / 1280.0f);
-                //screenTexture[i][j][0] = (unsigned char)(i * 255.0f / 720.0f);
-                screenTexture[i][j][1] = (unsigned char)0;
-                screenTexture[i][j][2] = (unsigned char)0;
+        for (int j = 0; j < 255; j++) { // ROWS
+            for (int i = 0; i < 255; i++) { // COLUMNS
+                screenTexture[j][i][0] = (unsigned char)i;
+                //screenTexture[j][i][0] = (unsigned char)(i * 255.0f / 720.0f);
+                screenTexture[j][i][1] = (unsigned char)i;
+                screenTexture[j][i][2] = (unsigned char)255;
             }
         }
 	}

@@ -11,7 +11,7 @@ private:
 public:
     imGuiWrapper(ImGuiIO& _io) : io(_io), showDemoWindow(true) {}
 
-	void createImGuiContext(GLFWwindow* window, float mainScale, const char* glslVersion) {
+	void createImGuiContext(GLFWwindow* window, const char* glslVersion) {
         // Setup Dear ImGui context
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -25,8 +25,6 @@ public:
 
         // Setup scaling
         ImGuiStyle& style = ImGui::GetStyle();
-        style.ScaleAllSizes(mainScale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
-        style.FontScaleDpi = mainScale;        // Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
 #if GLFW_VERSION_MAJOR >= 3 && GLFW_VERSION_MINOR >= 3
         io.ConfigDpiScaleFonts = true;          // [Experimental] Automatically overwrite style.FontScaleDpi in Begin() when Monitor DPI changes. This will scale fonts but _NOT_ scale sizes/padding for now.
         io.ConfigDpiScaleViewports = true;      // [Experimental] Scale Dear ImGui and Platform Windows when Monitor DPI changes.
