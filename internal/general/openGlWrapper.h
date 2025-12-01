@@ -3,22 +3,6 @@
 
 #include "general.h"
 
-const char* vertexShaderSource = 
-"#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-const char* fragmentShaderSource = 
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(0.5f, 0.0f, 0.5f, 0.5f);\n"
-"}\n\0";
-
 const char* vertexShaderSourceAlt =
 "#version 330 core\n"
 "layout (location = 0) in vec2 aPos;\n"
@@ -40,41 +24,48 @@ const char* fragmentShaderSourceAlt =
 "   FragColor = texture(screenTexture, TexCoords);\n"
 "}\n\0";
 
-float textureQuadVertices[] = {
-    1.0f,   1.0f,   0.0f,   // top right
-    1.0f,   -1.0f,  0.0f,   // bottom right
-    -1.0f,  -1.0f,  0.0f,   // bottom left
-    -1.0f,  1.0f,   0.0f    // top left 
-};
-
-unsigned int textureQuadIndices[] = {
-    0, 1, 3,
-    1, 2, 3
-};
-
 class openGlWrapper {
 private:
     unsigned int shaderProgram;
-    unsigned int VBO, VAO, EBO;
+    unsigned int VBO, VAO;
     unsigned int FBO, textureColorBuffer, RBO;
     ImVec4 clearColor;
-    float textureQuadVertices[12];
-    unsigned int textureQuadIndices[6];
+    float textureQuadVertices[24];
+    const char* vertexShaderSource;
+    const char* fragmentShaderSource;
 
 public:
-    openGlWrapper() : shaderProgram(0), VBO(0), VAO(0), EBO(0),
+    openGlWrapper() : shaderProgram(0), VBO(0), VAO(0),
         FBO(0), textureColorBuffer(0), RBO(0),
         clearColor(ImVec4(0.0f, 0.0f, 0.0f, 1.0f)),
-        textureQuadVertices{
-             1.0f,  1.0f, 0.0f, // top right
-             1.0f, -1.0f, 0.0f, // bottom right
-            -1.0f, -1.0f, 0.0f, // bottom left
-            -1.0f,  1.0f, 0.0f  // top left 
-            },
-        textureQuadIndices{
-            0, 1, 3,
-            1, 2, 3
-        } {}
+        textureQuadVertices( 
+            // positions   // texCoords
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f,  0.0f, 0.0f,
+             1.0f, -1.0f,  1.0f, 0.0f,
+
+            -1.0f,  1.0f,  0.0f, 1.0f,
+             1.0f, -1.0f,  1.0f, 0.0f,
+             1.0f,  1.0f,  1.0f, 1.0f
+        ), 
+        vertexShaderSource(
+            "#version 330 core\n"
+            "layout (location = 0) in vec2 aPos;\n"
+            "layout (location = 1) in vec2 aTexCoords;\n"
+            "void main()\n"
+            "{\n"
+            "   gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
+            "}\0"
+        ),
+        fragmentShaderSource(
+            "#version 330 core\n"
+            "out vec4 FragColor;\n"
+            "void main()\n"
+            "{\n"
+            "   FragColor = vec4(0.5f, 0.0f, 0.5f, 0.5f);\n"
+            "}\n\0"
+        )
+    {}
 
 	void compileShaders() {
         // vertex shader
@@ -119,19 +110,17 @@ public:
     void createVertexBuffersAndAttributes() {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
         // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
         glBindVertexArray(VAO);
 
         // Vertex buffer
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(textureQuadVertices), textureQuadVertices, GL_STATIC_DRAW);
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(textureQuadIndices), textureQuadIndices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(textureQuadVertices), &textureQuadVertices, GL_STATIC_DRAW);
+        
         glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -170,7 +159,7 @@ public:
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         // Doesnt need to be unbound every time
         //glBindVertexArray(0);
     }
@@ -178,7 +167,6 @@ public:
     void deAllcoate() {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
-        glDeleteBuffers(1, &EBO);
         glDeleteProgram(shaderProgram);
         glDeleteRenderbuffers(1, &RBO);
         glDeleteFramebuffers(1, &FBO);
