@@ -3,8 +3,11 @@
 #include "internal/general/imGuiWrapper.h"
 #include "internal/general/openGlWrapper.h"
 
+#include "internal/general/renderer.h"
+
 glfwWrapper glfwW;
 openGlWrapper openGlW;
+renderer rayTracer;
 
 int main()
 {
@@ -26,9 +29,18 @@ int main()
     openGlW.createVertexBuffersAndAttributes();
     openGlW.createScreenTexture();
 
+    for (int i = 0; i < 7; i++) {
+        for (int j = 0; j < 12; j++) {
+            std::cout << j / 2 << " ";
+        }
+        std::cout << std::endl;
+    }
+
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))
     {
+        rayTracer.createScreenTexture();
+
         glfwW.resizeGLFW();
         openGlW.render();
         imGuiW.render();

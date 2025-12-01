@@ -30,7 +30,7 @@ public:
 
         // Create window with graphics context
         mainScale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
-        window = glfwCreateWindow((int)(WIDTH * mainScale), (int)(HEIGHT * mainScale), "Acceleration Structures", nullptr, nullptr);
+        window = glfwCreateWindow((int)(WIDTH), (int)(HEIGHT), "Acceleration Structures", nullptr, nullptr);
         if (window == nullptr)
             return;
         glfwMakeContextCurrent(window);

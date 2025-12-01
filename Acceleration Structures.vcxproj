@@ -156,6 +156,7 @@
     <ClInclude Include="internal\general\glfwWrapper.h" />
     <ClInclude Include="internal\general\imGuiWrapper.h" />
     <ClInclude Include="internal\general\openGlWrapper.h" />
+    <ClInclude Include="internal\general\renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />

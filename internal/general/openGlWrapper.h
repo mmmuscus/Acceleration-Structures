@@ -3,8 +3,6 @@
 
 #include "general.h"
 
-
-
 class openGlWrapper {
 private:
     unsigned int shaderProgram;
@@ -144,18 +142,17 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Change texture
-        unsigned char img[100][100][3];
-
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 100; j++) {
-                img[i][j][0] = (unsigned char)255;
-                img[i][j][1] = (unsigned char)0;
-                img[i][j][2] = (unsigned char)0;
-            }
-        }
-
         glBindTexture(GL_TEXTURE_2D, textureColorBuffer); // Was already bound
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 100, 100, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
+        glTexSubImage2D(GL_TEXTURE_2D,
+            0,                      // (Mip-map) level
+            0,                      // x Offset
+            0,                      // y Offset
+            WIDTH,                  // Width
+            HEIGHT,                 // Height
+            GL_RGB,                 // Format
+            GL_UNSIGNED_BYTE,       // Type
+            (GLvoid*)screenTexture  // Pixels
+        );
 
         // Render texture
         glUseProgram(shaderProgram);
