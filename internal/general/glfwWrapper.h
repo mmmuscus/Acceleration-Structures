@@ -3,36 +3,51 @@
 
 #include "general.h"
 
-static void glfw_error_callback(int error, const char* description)
-{
-    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
-}
 
+
+// Base is: https://github.com/ocornut/imgui/tree/docking/examples/example_glfw_opengl3
+// Enhanced by: https://learnopengl.com/Getting-started/OpenGL
 class glfwWrapper {
 private:
+    GLFWwindow* window;
     const char* glslVersion;
-    GLFWwindow* window = nullptr;
     float mainScale;
     ImVec4 clearColor;
 
+    static void glfwErrorCallback(int error, const char* description) {
+        fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+    }
+
 public:
+    glfwWrapper() : window(nullptr) {}
+
     void createGLFWContext() {
+        glfwSetErrorCallback(glfwErrorCallback);
+        if (!glfwInit())
+            return;
+
         // GL 3.0 + GLSL 130
         glslVersion = "#version 130";
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-        //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-        //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         // Create window with graphics context
         mainScale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
-        window = glfwCreateWindow((int)(1280 * mainScale), (int)(800 * mainScale), "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+        window = glfwCreateWindow((int)(1280 * mainScale), (int)(720 * mainScale), "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
         if (window == nullptr)
             return;
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1); // Enable vsync
 
         clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            std::cout << "Failed to initialize GLAD" << std::endl;
+            window = nullptr;
+            return;
+        }
     }
 
     void renderGLFW() {
@@ -51,6 +66,9 @@ public:
         glfwDestroyWindow(window);
         glfwTerminate();
     }
+
+private:
+
 };
 
 #endif // !GLFW_WRAPPER_H_

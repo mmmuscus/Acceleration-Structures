@@ -6,13 +6,11 @@ glfwWrapper glfwW;
 
 int main(int, char**)
 {
-    glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit())
-        return 1;
-
-    // Create contexts
+    // Create GLFW context
     glfwW.createGLFWContext();
+    if (glfwW.getWindow() == nullptr) return 1;
 
+    // Create imGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
