@@ -3,7 +3,6 @@
 #include "internal/general/imGuiWrapper.h"
 
 glfwWrapper glfwW;
-imGuiWrapper imGuiW;
 
 int main(int, char**)
 {
@@ -13,6 +12,12 @@ int main(int, char**)
 
     // Create contexts
     glfwW.createGLFWContext();
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    imGuiWrapper imGuiW = imGuiWrapper(io);
     imGuiW.createImGuiContext(
         glfwW.getWindow(), glfwW.getMainScale(), glfwW.getGlslVersion()
     );

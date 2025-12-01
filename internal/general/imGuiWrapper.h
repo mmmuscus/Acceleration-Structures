@@ -5,15 +5,14 @@
 
 class imGuiWrapper {
 private:
-    ImGuiIO io;
+    ImGuiIO& io;
     bool showDemoWindow;
 
 public:
+    imGuiWrapper(ImGuiIO& _io) : io(_io), showDemoWindow(true) {}
+
 	void createImGuiContext(GLFWwindow* window, float mainScale, const char* glslVersion) {
         // Setup Dear ImGui context
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        io = ImGui::GetIO(); (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
