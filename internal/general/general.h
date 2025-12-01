@@ -23,4 +23,7 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
+const unsigned int WIDTH = 1280;
+const unsigned int HEIGHT = 720;
+
 #endif // GENERAL_H_

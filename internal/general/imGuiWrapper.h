@@ -46,7 +46,7 @@ public:
         showDemoWindow = true;
 	}
 
-    void startImGuiRender() {
+    void render() {
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -58,9 +58,10 @@ public:
 
         // Rendering imGui window
         ImGui::Render();
-    }
-
-    void finishImGuiRender() {
+        
+        // --------------------------
+        // SECOND HALF OF THE RENDER: 
+        // --------------------------
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Update and Render additional Platform Windows

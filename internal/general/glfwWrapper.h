@@ -3,8 +3,6 @@
 
 #include "general.h"
 
-
-
 // Base is: https://github.com/ocornut/imgui/tree/docking/examples/example_glfw_opengl3
 // Enhanced by: https://learnopengl.com/Getting-started/OpenGL
 class glfwWrapper {
@@ -12,7 +10,6 @@ private:
     GLFWwindow* window;
     const char* glslVersion;
     float mainScale;
-    ImVec4 clearColor;
 
     static void glfwErrorCallback(int error, const char* description) {
         fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -34,13 +31,11 @@ public:
 
         // Create window with graphics context
         mainScale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()); // Valid on GLFW 3.3+ only
-        window = glfwCreateWindow((int)(1280 * mainScale), (int)(720 * mainScale), "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+        window = glfwCreateWindow((int)(WIDTH * mainScale), (int)(HEIGHT * mainScale), "Acceleration Structures", nullptr, nullptr);
         if (window == nullptr)
             return;
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1); // Enable vsync
-
-        clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
@@ -50,12 +45,15 @@ public:
         }
     }
 
-    void renderGLFW() {
+    void resizeGLFW() {
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    void swapBuffers() {
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
 
     const char* getGlslVersion() { return glslVersion; }

@@ -1,12 +1,13 @@
 #include "internal/general/general.h"
 #include "internal/general/glfwWrapper.h"
 #include "internal/general/imGuiWrapper.h"
+#include "internal/general/openGlWrapper.h"
 
 glfwWrapper glfwW;
+openGlWrapper openGlW;
 
-int main(int, char**)
+int main()
 {
-    // Create GLFW context
     glfwW.createGLFWContext();
     if (glfwW.getWindow() == nullptr) return 1;
 
@@ -20,24 +21,20 @@ int main(int, char**)
         glfwW.getWindow(), glfwW.getMainScale(), glfwW.getGlslVersion()
     );
 
+    // OpenGL
+    openGlW.compileShaders();
+    openGlW.createVertexBuffersAndAttributes();
+
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))
     {
-        // Poll and handle events (inputs, window resize, etc.)
-        glfwPollEvents();
-        if (glfwGetWindowAttrib(glfwW.getWindow(), GLFW_ICONIFIED) != 0)
-        {
-            ImGui_ImplGlfw_Sleep(10);
-            continue;
-        }
-
-        // Rendering imGui below, functions have to be executed sequentially as such
-        imGuiW.startImGuiRender();
-        glfwW.renderGLFW();
-        imGuiW.finishImGuiRender();
-
-        glfwSwapBuffers(glfwW.getWindow());
+        glfwW.resizeGLFW();
+        openGlW.render();
+        imGuiW.render();
+        glfwW.swapBuffers();
     }
 
+    // Cleanup
+    openGlW.deAllcoate();
     return 0;
 }
