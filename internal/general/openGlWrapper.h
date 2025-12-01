@@ -3,6 +3,25 @@
 
 #include "general.h"
 
+/*
+Vertex shader:
+"#version 330 core\n"
+"layout (location = 0) in vec2 aPos;\n"
+"layout (location = 1) in vec2 aTexCoords;\n"
+"void main()\n"
+"{\n"
+"   gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
+"}\0"
+
+Fragment shader:
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"   FragColor = vec4(0.5f, 0.0f, 0.5f, 0.5f);\n"
+"}\n\0"
+*/
+
 const char* vertexShaderSourceAlt =
 "#version 330 core\n"
 "layout (location = 0) in vec2 aPos;\n"
@@ -52,17 +71,21 @@ public:
             "#version 330 core\n"
             "layout (location = 0) in vec2 aPos;\n"
             "layout (location = 1) in vec2 aTexCoords;\n"
+            "out vec2 TexCoords;\n"
             "void main()\n"
             "{\n"
             "   gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
+            "   TexCoords = aTexCoords;\n"
             "}\0"
         ),
         fragmentShaderSource(
             "#version 330 core\n"
             "out vec4 FragColor;\n"
+            "in vec2 TexCoords;\n"
+            "uniform sampler2D screenTexture;"
             "void main()\n"
             "{\n"
-            "   FragColor = vec4(0.5f, 0.0f, 0.5f, 0.5f);\n"
+            "   FragColor = texture(screenTexture, TexCoords);\n"
             "}\n\0"
         )
     {}
@@ -159,6 +182,7 @@ public:
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // Doesnt need to be unbound every time
         //glBindVertexArray(0);
