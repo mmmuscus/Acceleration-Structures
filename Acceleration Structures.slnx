@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Acceleration Structures.vcxproj" Id="5aeaf250-19bd-44d0-a898-5c7cd7ee821f" />
+</Solution>
