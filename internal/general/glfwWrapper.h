@@ -16,7 +16,7 @@ private:
     }
 
 public:
-    glfwWrapper() : window(nullptr) {}
+    glfwWrapper() : window(nullptr), glslVersion("#version 130"), mainScale(0.0f) {}
 
     void createGLFWContext() {
         glfwSetErrorCallback(glfwErrorCallback);
@@ -24,7 +24,6 @@ public:
             return;
 
         // GL 3.0 + GLSL 130
-        glslVersion = "#version 130";
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
