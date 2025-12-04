@@ -28,6 +28,6 @@ const unsigned int HEIGHT = 720;
 
 // idx 0: WIDTH
 // idx 1: HEIGHT
-unsigned char screenTexture[WIDTH][HEIGHT][3]; 
+unsigned char screenTexture[WIDTH * HEIGHT][3];
 
 #endif // GENERAL_H_
