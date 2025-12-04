@@ -152,16 +152,18 @@
     <ClInclude Include="external\imGui\imstb_rectpack.h" />
     <ClInclude Include="external\imGui\imstb_textedit.h" />
     <ClInclude Include="external\imGui\imstb_truetype.h" />
-    <ClInclude Include="internal\general\general.h" />
-    <ClInclude Include="internal\general\glfwWrapper.h" />
-    <ClInclude Include="internal\general\imGuiWrapper.h" />
-    <ClInclude Include="internal\general\openGlWrapper.h" />
-    <ClInclude Include="internal\general\renderer.h" />
+    <ClInclude Include="general\general.h" />
+    <ClInclude Include="general\glfwWrapper.h" />
+    <ClInclude Include="general\imGuiWrapper.h" />
+    <ClInclude Include="general\openGlWrapper.h" />
+    <ClInclude Include="rayTracer\renderer.h" />
+    <ClInclude Include="rayTracer\triangle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
     <None Include="Acceleration Structures.slnx" />
+    <None Include="imgui.ini" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

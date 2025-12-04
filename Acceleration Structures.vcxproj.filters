@@ -39,6 +39,9 @@
     <ClCompile Include="external\imGui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="external\glad\src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\imGui\imconfig.h">
@@ -68,17 +71,36 @@
     <ClInclude Include="external\imGui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="internal\general\general.h">
+    <ClInclude Include="general\general.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="internal\general\glfwWrapper.h">
+    <ClInclude Include="general\glfwWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="internal\general\imGuiWrapper.h">
+    <ClInclude Include="general\imGuiWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="external\glad\include\glad\glad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="external\glad\include\KHR\khrplatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="general\openGlWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rayTracer\renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rayTracer\triangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Acceleration Structures.slnx" />
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="README.md" />
+    <None Include="imgui.ini" />
   </ItemGroup>
 </Project>

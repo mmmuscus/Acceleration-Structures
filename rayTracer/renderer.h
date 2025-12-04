@@ -1,7 +1,7 @@
 #ifndef RENDERER_H_
 #define RENDERER_H_
 
-#include "general.h"
+#include "../general/general.h"
 
 class renderer {
 private:

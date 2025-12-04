@@ -1,9 +1,9 @@
-#include "internal/general/general.h"
-#include "internal/general/glfwWrapper.h"
-#include "internal/general/imGuiWrapper.h"
-#include "internal/general/openGlWrapper.h"
+#include "general/general.h"
+#include "general/glfwWrapper.h"
+#include "general/imGuiWrapper.h"
+#include "general/openGlWrapper.h"
 
-#include "internal/general/renderer.h"
+#include "rayTracer/renderer.h"
 
 glfwWrapper glfwW;
 openGlWrapper openGlW;

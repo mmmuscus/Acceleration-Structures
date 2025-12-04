@@ -6,9 +6,9 @@
 
 // Start of project based off of: https://github.com/ocornut/imgui/tree/docking/examples/example_glfw_opengl3
 
-#include "../../external/imGui/imgui.h"
-#include "../../external/imGui/imgui_impl_glfw.h"
-#include "../../external/imGui/imgui_impl_opengl3.h"
+#include "../external/imGui/imgui.h"
+#include "../external/imGui/imgui_impl_glfw.h"
+#include "../external/imGui/imgui_impl_opengl3.h"
 #include <stdio.h>
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
