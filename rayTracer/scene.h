@@ -14,9 +14,12 @@ private:
 public:
 	void initScene() {
 		for (int i = 0; i < TRIANGLE_COUNT; i++) {
+			prims[i].p0 = glm::vec3(dt(rng), dt(rng), dt(rng));
 			prims[i].p1 = glm::vec3(dt(rng), dt(rng), dt(rng));
 			prims[i].p2 = glm::vec3(dt(rng), dt(rng), dt(rng));
-			prims[i].p3 = glm::vec3(dt(rng), dt(rng), dt(rng));
+
+			// Calculate centroid
+			prims[i].calculateCentroid();
 		}
 	}
 };

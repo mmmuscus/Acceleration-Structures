@@ -29,6 +29,8 @@
 
 #include <random>
 
+#define EPSILON 0.000001f
+
 std::random_device dev;
 std::mt19937 rng(dev());
 std::uniform_real_distribution<float> dt(-5.0f, 5.0f);
@@ -40,6 +42,5 @@ const unsigned int HEIGHT = 720;
 // idx 0: WIDTH
 // idx 1: HEIGHT
 unsigned char screenTexture[WIDTH * HEIGHT][3];
-
 
 #endif // GENERAL_H_
