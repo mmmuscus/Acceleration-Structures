@@ -2,11 +2,10 @@
 #define TRIANGLE_H_
 
 class triangle {
-private:
-
-
 public:
-
+	float p1, p2, p3;
+	float centroid;
+	
 
 };
 
