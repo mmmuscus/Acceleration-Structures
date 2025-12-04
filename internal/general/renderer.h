@@ -12,8 +12,8 @@ public:
         for (int j = 0; j < HEIGHT; j++) { // ROWS
             for (int i = 0; i < WIDTH; i++) { // COLUMNS
                 unsigned int offset = j * WIDTH + i;
-                screenTexture[offset][0] = i;
-                screenTexture[offset][1] = j;
+                screenTexture[offset][0] = (unsigned int)(i * 255.0f / WIDTH);
+                screenTexture[offset][1] = (unsigned int)(j * 255.0f / HEIGHT);
                 screenTexture[offset][2] = 0;
             }
         }
