@@ -156,6 +156,7 @@
     <ClInclude Include="general\glfwWrapper.h" />
     <ClInclude Include="general\imGuiWrapper.h" />
     <ClInclude Include="general\openGlWrapper.h" />
+    <ClInclude Include="rayTracer\ray.h" />
     <ClInclude Include="rayTracer\renderer.h" />
     <ClInclude Include="rayTracer\triangle.h" />
   </ItemGroup>

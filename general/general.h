@@ -23,11 +23,18 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
+// -------
+
+#include "../external/glm/glm.hpp"
+
+#include <random>
+
 const unsigned int WIDTH = 1280;
 const unsigned int HEIGHT = 720;
 
 // idx 0: WIDTH
 // idx 1: HEIGHT
 unsigned char screenTexture[WIDTH * HEIGHT][3];
+
 
 #endif // GENERAL_H_
