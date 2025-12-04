@@ -158,6 +158,7 @@
     <ClInclude Include="general\openGlWrapper.h" />
     <ClInclude Include="rayTracer\ray.h" />
     <ClInclude Include="rayTracer\renderer.h" />
+    <ClInclude Include="rayTracer\scene.h" />
     <ClInclude Include="rayTracer\triangle.h" />
   </ItemGroup>
   <ItemGroup>

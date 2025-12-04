@@ -4,15 +4,18 @@
 #include "general/openGlWrapper.h"
 
 #include "rayTracer/renderer.h"
+#include "rayTracer/scene.h"
 
 glfwWrapper glfwW;
 openGlWrapper openGlW;
 renderer rayTracer;
+scene sc;
 
 int main()
 {
     glfwW.createGLFWContext();
     if (glfwW.getWindow() == nullptr) return 1;
+    std::cout << "GLFW Context successfully created" << std::endl;
 
     // Create imGui context
     IMGUI_CHECKVERSION();
@@ -24,10 +27,17 @@ int main()
         glfwW.getWindow(), glfwW.getGlslVersion()
     );
 
+    std::cout << "imGui Context successfully created" << std::endl;
+
     // OpenGL
     openGlW.compileShaders();
     openGlW.createVertexBuffersAndAttributes();
     openGlW.createScreenTexture();
+    std::cout << "OpenGL Context successfully created" << std::endl;
+
+    // Scene
+    sc.initScene();
+    std::cout << "Scene successfully populated" << std::endl;
 
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))

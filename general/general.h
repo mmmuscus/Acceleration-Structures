@@ -29,6 +29,11 @@
 
 #include <random>
 
+std::random_device dev;
+std::mt19937 rng(dev());
+std::uniform_real_distribution<float> dt(-5.0f, 5.0f);
+// Random nubmer for distribution -5 - 5 by calling dt(rng)
+
 const unsigned int WIDTH = 1280;
 const unsigned int HEIGHT = 720;
 
