@@ -9,7 +9,7 @@
 glfwWrapper glfwW;
 openGlWrapper openGlW;
 renderer rayTracer;
-scene sc(glm::vec3(0.0f, 0.0f, 18.0f));
+scene sc(glm::vec3(0.0f, 0.0f, -18.0f));
 
 int main()
 {
@@ -44,9 +44,6 @@ int main()
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))
     {
-        //rayTracer.createScreenTexture();
-        
-
         glfwW.resizeGLFW();
         openGlW.render();
         imGuiW.render();

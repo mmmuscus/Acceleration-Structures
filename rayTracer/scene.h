@@ -38,24 +38,32 @@ public:
 				glm::vec3 pixelWorldPos =
 					topLeft + (bottomLeft - topLeft) * ((float)j / HEIGHT) +
 					topLeft + (topRight - topLeft) * ((float)i / WIDTH);
+				pixelWorldPos.z /= 2.0f;
+
+				std::cout << "Pixel world pos: " <<
+					pixelWorldPos.x << " " << pixelWorldPos.y << " " << pixelWorldPos.z << std::endl;
 
 				r.O = camera;
 				r.D = glm::normalize(pixelWorldPos - r.O);
 				r.t = 1e30f;
 
-				std::cout << "Tracing ray number " << j * WIDTH + i << " has startred, out of: " << HEIGHT * WIDTH << std::endl;
+				//std::cout << "Tracing ray number " << j * WIDTH + i << " has startred, out of: " << HEIGHT * WIDTH << std::endl;
 				for (int n = 0; n < TRIANGLE_COUNT; n++)
 					prims[n].rayIntersection(r);
 
-				std::cout << "Assigning color to pixel" << std::endl;
+				//std::cout << "Result: " << r.t << std::endl;
+
+				//std::cout << "Assigning color to pixel" << std::endl;
 				unsigned int offset = j * WIDTH + i;
-				if (r.t < 1e30f) {
+				if (r.t < 1e30f) { 
+					std::cout << "HIT" << std::endl;
 					screenTexture[offset][0] = 255;
 					screenTexture[offset][1] = 255;
 					screenTexture[offset][2] = 255;
 				}
 				else
 				{
+					std::cout << "MISS" << std::endl;
 					screenTexture[offset][0] = 0;
 					screenTexture[offset][1] = 0;
 					screenTexture[offset][2] = 0;
