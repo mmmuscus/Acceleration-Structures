@@ -35,10 +35,10 @@ public:
 		ray r;
 		for (int j = 0; j < HEIGHT; j++) { // ROWS
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
-				glm::vec3 pixelWorldPos =
-					topLeft + (bottomLeft - topLeft) * ((float)j / HEIGHT) +
-					topLeft + (topRight - topLeft) * ((float)i / WIDTH);
-				pixelWorldPos.z /= 2.0f;
+				glm::vec3 pixelWorldPos = topLeft + 
+					(bottomLeft - topLeft) * ((float)j / HEIGHT) +
+					(topRight - topLeft) * ((float)i / WIDTH);
+				//pixelWorldPos /= 2.0f;
 
 				std::cout << "Pixel world pos: " <<
 					pixelWorldPos.x << " " << pixelWorldPos.y << " " << pixelWorldPos.z << std::endl;
