@@ -22,6 +22,23 @@ public:
 		subdivide(0);
 	}
 
+	void traverse(ray& r, unsigned int nodeIdx) {
+		BVHNode& curr = nodes[nodeIdx];
+
+		if (!curr.intersectAABB(r))
+			return;
+
+		if (curr.primCount != 0) {
+			for (int i = 0; i < curr.primCount; i++) {
+				prims[curr.leftFirst + i].rayIntersection(r);
+			}
+		}
+		else {
+			traverse(r, curr.leftFirst);
+			traverse(r, curr.leftFirst + 1);
+		}
+	}
+
 private:
 	void subdivide(unsigned int nodeIdx) {
 		if (nodes[nodeIdx].primCount <= 3)
@@ -61,10 +78,12 @@ private:
 		BVHNode& left = nodes[leftIdx];
 		left.leftFirst = curr.leftFirst;
 		left.primCount = leftCount;
+		left.updateBounds();
 		curr.leftFirst = leftIdx;
 		BVHNode& right = nodes[rightIdx];
 		right.leftFirst = left.leftFirst + left.primCount;
 		right.primCount = curr.primCount - left.primCount;
+		right.updateBounds();
 		curr.primCount = 0;
 
 		// Recurse
