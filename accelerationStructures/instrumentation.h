@@ -38,4 +38,6 @@ public:
 	}
 };
 
+instrumentation stepCounter;
+
 #endif // !INSTRUMENTATION_H_

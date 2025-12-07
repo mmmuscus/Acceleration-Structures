@@ -55,6 +55,8 @@ int main()
         openGlW.render();
         imGuiW.render();
         glfwW.swapBuffers();
+
+        sc.render(bvh, false);
     }
 
     // Cleanup

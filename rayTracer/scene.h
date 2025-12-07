@@ -31,7 +31,9 @@ public:
 	}
 
 	void render(BVH& bvh, bool useBVH) {
+		stepCounter.reset();
 		ray r;
+
 		for (int j = 0; j < HEIGHT; j++) { // ROWS
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
 				glm::vec3 pixelWorldPos = topLeft + 
@@ -42,9 +44,6 @@ public:
 				r.D = glm::normalize(pixelWorldPos - r.O);
 				r.t = 1e30f;
 
-				//std::cout << "Tracing ray number " << j * WIDTH + i << " has startred, out of: " << HEIGHT * WIDTH << std::endl;
-				//for (int n = 0; n < TRIANGLE_COUNT; n++)
-				//	prims[n].rayIntersection(r);
 				if (useBVH)
 					bvh.traverse(r, 0);
 				else
@@ -53,25 +52,22 @@ public:
 						prims[n].rayIntersection(r);
 				}
 
-				//std::cout << "Result: " << r.t << std::endl;
-
-				//std::cout << "Assigning color to pixel" << std::endl;
 				unsigned int offset = j * WIDTH + i;
 				if (r.t < 1e30f) { 
-					std::cout << "HIT" << std::endl;
 					screenTexture[offset][0] = 255;
 					screenTexture[offset][1] = 255;
 					screenTexture[offset][2] = 255;
 				}
 				else
 				{
-					std::cout << "MISS" << std::endl;
 					screenTexture[offset][0] = 0;
 					screenTexture[offset][1] = 0;
 					screenTexture[offset][2] = 0;
 				}
 			}
 		}
+
+		stepCounter.print();
 	}
 };
 

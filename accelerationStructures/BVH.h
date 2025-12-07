@@ -4,6 +4,7 @@
 #include "../general/general.h"
 
 #include "BVHNode.h"
+#include "instrumentation.h"
 
 class BVH {
 private:
@@ -25,6 +26,8 @@ public:
 	}
 
 	void traverse(ray& r, unsigned int nodeIdx) {
+		stepCounter.increaseTraversal();
+
 		BVHNode& curr = nodes[nodeIdx];
 
 		if (!curr.intersectAABB(r))

@@ -107,6 +107,9 @@
     <ClInclude Include="accelerationStructures\BVH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="accelerationStructures\instrumentation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Acceleration Structures.slnx" />

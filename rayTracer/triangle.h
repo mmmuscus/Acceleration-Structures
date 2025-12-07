@@ -3,6 +3,8 @@
 
 #include "../general/general.h"
 
+#include "../accelerationStructures/instrumentation.h"
+
 #include "ray.h"
 
 class triangle {
@@ -16,6 +18,8 @@ public:
 
 	// Lifted from https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 	void rayIntersection(ray& r) {
+		stepCounter.increaseIntersection();
+
 		const glm::vec3 edge1 = p1 - p0;
 		const glm::vec3 edge2 = p2 - p0;
 		const glm::vec3 h = glm::cross(r.D, edge2);

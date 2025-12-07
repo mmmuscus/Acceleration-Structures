@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="accelerationStructures\BVH.h" />
     <ClInclude Include="accelerationStructures\BVHNode.h" />
+    <ClInclude Include="accelerationStructures\instrumentation.h" />
     <ClInclude Include="external\glad\include\glad\glad.h" />
     <ClInclude Include="external\glad\include\KHR\khrplatform.h" />
     <ClInclude Include="external\imGui\imconfig.h" />
