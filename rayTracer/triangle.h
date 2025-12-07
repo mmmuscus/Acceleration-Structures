@@ -70,4 +70,6 @@ public:
 	}
 };
 
+triangle prims[TRIANGLE_COUNT];
+
 #endif // TRIANGLE_H_ 

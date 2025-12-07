@@ -1,5 +1,4 @@
 #ifndef BVH_NODE_H_
-
 #define BVH_NODE_H_
 
 #include "../general/general.h"
@@ -8,19 +7,17 @@
 #include "../rayTracer/ray.h"
 
 class BVHNode {
-private:
+public:
 	glm::vec3 AABBmin, AABBmax;
 	unsigned int leftFirst, primCount;
 
-public:
 	BVHNode() :
 		AABBmin(glm::vec3(1e30f, 1e30f, 1e30f)),
 		AABBmax(glm::vec3(-1e30f, -1e30f, -1e30f)),
 		leftFirst(0), primCount(0)
-	{
-	}
+	{}
 
-	void updateBounds(triangle prims[]) {
+	void updateBounds() {
 		if (primCount == 0)
 			return;
 

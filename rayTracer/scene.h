@@ -5,11 +5,8 @@
 
 #include "triangle.h"
 
-const unsigned int TRIANGLE_COUNT = 64;
-
 class scene {
 private:
-	triangle prims[TRIANGLE_COUNT];
 	glm::vec3 camera;
 	glm::vec3 topRight, topLeft, bottomLeft; // from perspective of camera
 
