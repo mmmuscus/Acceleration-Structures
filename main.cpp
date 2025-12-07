@@ -44,7 +44,6 @@ int main()
 
     // Build BVH
     bvh.buildBVH();
-    std::cout << "BVH successfully built" << std::endl;
 
     sc.render(bvh, true);
 

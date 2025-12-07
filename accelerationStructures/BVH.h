@@ -22,7 +22,7 @@ public:
 
 		subdivide(0);
 
-		std::cout << "END" << std::endl;
+		std::cout << "BVH successfully built" << std::endl;
 	}
 
 	void traverse(ray& r, unsigned int nodeIdx) {
