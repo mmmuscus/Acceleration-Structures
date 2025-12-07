@@ -14,14 +14,15 @@ public:
 	BVH() : nodesUsed(1) {}
 
 	void buildBVH() {
-		BVHNode root = nodes[0];
+		BVHNode& root = nodes[0];
 		root.leftFirst = 0; 
 		root.primCount = TRIANGLE_COUNT;
 		root.updateBounds();
 
-		// Subdivide !!!
+		subdivide(0);
 	}
 
+private:
 	void subdivide(unsigned int nodeIdx) {
 		if (nodes[nodeIdx].primCount <= 3)
 			return;
@@ -31,7 +32,7 @@ public:
 
 		split(nodeIdx, splitAxis, splitPosition);
 
-		BVHNode curr = nodes[nodeIdx];
+		BVHNode& curr = nodes[nodeIdx];
 
 		// Swap triangles around
 		unsigned int start = curr.leftFirst;
@@ -57,11 +58,11 @@ public:
 		// "Create" new child nodes, assign values correctly
 		unsigned int leftIdx = nodesUsed++;
 		unsigned int rightIdx = nodesUsed++;
-		BVHNode left = nodes[leftIdx];
+		BVHNode& left = nodes[leftIdx];
 		left.leftFirst = curr.leftFirst;
 		left.primCount = leftCount;
 		curr.leftFirst = leftIdx;
-		BVHNode right = nodes[rightIdx];
+		BVHNode& right = nodes[rightIdx];
 		right.leftFirst = left.leftFirst + left.primCount;
 		right.primCount = curr.primCount - left.primCount;
 		curr.primCount = 0;
@@ -72,7 +73,7 @@ public:
 	}
 
 	void split(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
-		BVHNode curr = nodes[idx];
+		BVHNode& curr = nodes[idx];
 		glm::vec3 diff = curr.AABBmax - curr.AABBmin;
 
 		if (diff.x >= diff.y && diff.x >= diff.z) {

@@ -6,10 +6,13 @@
 #include "rayTracer/renderer.h"
 #include "rayTracer/scene.h"
 
+#include "accelerationStructures/BVH.h"
+
 glfwWrapper glfwW;
 openGlWrapper openGlW;
 renderer rayTracer;
 scene sc(glm::vec3(0.0f, 0.0f, -18.0f));
+BVH bvh;
 
 int main()
 {
@@ -39,7 +42,11 @@ int main()
     sc.initScene();
     std::cout << "Scene successfully populated" << std::endl;
 
-    sc.render();
+    // Build BVH
+    bvh.buildBVH();
+    std::cout << "BVH successfully built" << std::endl;
+
+    // sc.render();
 
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))
