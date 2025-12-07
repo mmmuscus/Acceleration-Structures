@@ -46,7 +46,7 @@ int main()
     bvh.buildBVH();
     std::cout << "BVH successfully built" << std::endl;
 
-    // sc.render();
+    sc.render(bvh, true);
 
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))

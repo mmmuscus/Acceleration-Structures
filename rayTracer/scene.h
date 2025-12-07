@@ -3,6 +3,8 @@
 
 #include "../general/general.h"
 
+#include "../accelerationStructures/BVH.h"
+
 #include "triangle.h"
 
 class scene {
@@ -28,25 +30,28 @@ public:
 		}
 	}
 
-	void render() {
+	void render(BVH& bvh, bool useBVH) {
 		ray r;
 		for (int j = 0; j < HEIGHT; j++) { // ROWS
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
 				glm::vec3 pixelWorldPos = topLeft + 
 					(bottomLeft - topLeft) * ((float)j / HEIGHT) +
 					(topRight - topLeft) * ((float)i / WIDTH);
-				//pixelWorldPos /= 2.0f;
-
-				std::cout << "Pixel world pos: " <<
-					pixelWorldPos.x << " " << pixelWorldPos.y << " " << pixelWorldPos.z << std::endl;
 
 				r.O = camera;
 				r.D = glm::normalize(pixelWorldPos - r.O);
 				r.t = 1e30f;
 
 				//std::cout << "Tracing ray number " << j * WIDTH + i << " has startred, out of: " << HEIGHT * WIDTH << std::endl;
-				for (int n = 0; n < TRIANGLE_COUNT; n++)
-					prims[n].rayIntersection(r);
+				//for (int n = 0; n < TRIANGLE_COUNT; n++)
+				//	prims[n].rayIntersection(r);
+				if (useBVH)
+					bvh.traverse(r, 0);
+				else
+				{
+					for (int n = 0; n < TRIANGLE_COUNT; n++)
+						prims[n].rayIntersection(r);
+				}
 
 				//std::cout << "Result: " << r.t << std::endl;
 
