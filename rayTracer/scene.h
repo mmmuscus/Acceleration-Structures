@@ -21,13 +21,20 @@ public:
 
 	void initScene() {
 		for (int i = 0; i < TRIANGLE_COUNT; i++) {
-			prims[i].p0 = glm::vec3(dt(rng), dt(rng), dt(rng));
-			prims[i].p1 = glm::vec3(dt(rng), dt(rng), dt(rng));
-			prims[i].p2 = glm::vec3(dt(rng), dt(rng), dt(rng));
+			triangle prim;
+
+			prim.p0 = glm::vec3(dt(rng), dt(rng), dt(rng));
+			prim.p1 = glm::vec3(dt(rng), dt(rng), dt(rng));
+			prim.p2 = glm::vec3(dt(rng), dt(rng), dt(rng));
 
 			// Calculate centroid
-			prims[i].calculateCentroid();
+			prim.calculateCentroid();
+
+			prims.push_back(prim);
 		}
+
+		// Update triangle count
+		TRIANGLE_COUNT = prims.size();
 	}
 
 	void render(BVH& bvh, bool useBVH) {

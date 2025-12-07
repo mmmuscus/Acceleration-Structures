@@ -8,11 +8,16 @@
 
 class BVH {
 private:
-	BVHNode nodes[TRIANGLE_COUNT * 2 - 1];
+	std::vector<BVHNode> nodes;
 	unsigned int nodesUsed;
 
 public:
-	BVH() : nodesUsed(1) {}
+	BVH() : nodesUsed(1) {
+		for (int i = 0; i < TRIANGLE_COUNT * 2 - 1; i++) {
+			BVHNode newNode;
+			nodes.push_back(newNode);
+		}
+	}
 
 	void buildBVH() {
 		BVHNode& root = nodes[0];

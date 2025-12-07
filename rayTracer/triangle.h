@@ -74,6 +74,6 @@ public:
 	}
 };
 
-triangle prims[TRIANGLE_COUNT];
+std::vector<triangle> prims;
 
 #endif // TRIANGLE_H_ 

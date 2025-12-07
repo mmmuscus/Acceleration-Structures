@@ -43,6 +43,9 @@ const unsigned int HEIGHT = 400;
 // idx 1: HEIGHT	0
 unsigned char screenTexture[WIDTH * HEIGHT][3];
 
-const unsigned int TRIANGLE_COUNT = 64;
+unsigned int TRIANGLE_COUNT = 64;
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 
 #endif // GENERAL_H_
