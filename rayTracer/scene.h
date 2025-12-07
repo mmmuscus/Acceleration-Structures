@@ -15,9 +15,9 @@ private:
 
 public:
 	scene(glm::vec3 _c) : camera(_c), 
-		topRight(glm::vec3(1.0f, 1.0f, camera.z + 3.0f)),
-		topLeft(glm::vec3(-1.0f, 1.0f, camera.z + 3.0f)),
-		bottomLeft(glm::vec3(-1.0f, -1.0f, camera.z + 3.0f))
+		topRight(glm::vec3(1.0f, 1.0f, camera.z + 1.0f)),
+		topLeft(glm::vec3(-1.0f, 1.0f, camera.z + 1.0f)),
+		bottomLeft(glm::vec3(-1.0f, -1.0f, camera.z + 1.0f))
 	{}
 
 	void initScene() {

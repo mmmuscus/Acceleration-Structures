@@ -141,6 +141,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="accelerationStructures\BVHNode.h" />
     <ClInclude Include="external\glad\include\glad\glad.h" />
     <ClInclude Include="external\glad\include\KHR\khrplatform.h" />
     <ClInclude Include="external\imGui\imconfig.h" />
