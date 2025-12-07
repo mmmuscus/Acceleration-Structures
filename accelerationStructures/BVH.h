@@ -20,6 +20,8 @@ public:
 		root.updateBounds();
 
 		subdivide(0);
+
+		std::cout << "END" << std::endl;
 	}
 
 	void traverse(ray& r, unsigned int nodeIdx) {
@@ -60,8 +62,8 @@ private:
 			}
 			else {
 				// Ugly swap
-				triangle temp = prims[end];
-				prims[end] = prims[start];
+				triangle temp = prims[end - 1];
+				prims[end - 1] = prims[start];
 				prims[start] = temp;
 				end--;
 			}

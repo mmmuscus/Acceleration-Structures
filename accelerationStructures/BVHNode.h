@@ -21,7 +21,8 @@ public:
 		if (primCount == 0)
 			return;
 
-		for (int i = leftFirst; i < primCount; i++) {
+		int end = leftFirst + primCount;
+		for (int i = leftFirst; i < end; i++) {
 			glm::vec3 triMin = prims[i].min();
 			
 			AABBmin.x = fminf(AABBmin.x, triMin.x);
