@@ -46,18 +46,21 @@ int main()
     bvh.buildBVH();
 
     sc.render(bvh, true);
+    glfwW.resizeGLFW();
+    openGlW.render();
+    imGuiW.render();
+    glfwW.swapBuffers();
+
+    glfwW.resizeGLFW();
+    openGlW.render();
+    imGuiW.render();
+    glfwW.swapBuffers();
+    sc.render(bvh, false);
 
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))
     {
-        glfwW.resizeGLFW();
-        openGlW.render();
-        imGuiW.render();
-        glfwW.swapBuffers();
-
-        sc.render(bvh, false);
-
-        std::cout << "Scene successfully populated" << std::endl;
+        ;
     }
 
     // Cleanup

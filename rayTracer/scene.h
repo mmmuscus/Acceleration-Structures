@@ -87,6 +87,8 @@ public:
 
 		for (int j = 0; j < HEIGHT; j++) { // ROWS
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
+				stepCounter.setHeightWidth(j, i);
+
 				glm::vec3 pixelWorldPos = topLeft + 
 					(bottomLeft - topLeft) * ((float)j / HEIGHT) +
 					(topRight - topLeft) * ((float)i / WIDTH);
@@ -118,6 +120,7 @@ public:
 			}
 		}
 
+		stepCounter.calculateValues();
 		stepCounter.print();
 	}
 };
