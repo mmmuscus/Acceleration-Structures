@@ -116,21 +116,21 @@ public:
 
 				intersectionValue /= diffIntersection;
 				glm::vec3 lerpedColor = findLerpValue(intersectionValue);
-				intersectionTexture[offset][0] = lerpedColor.x;
-				intersectionTexture[offset][1] = lerpedColor.y;
-				intersectionTexture[offset][2] = lerpedColor.z;
+				textures[1][offset][0] = lerpedColor.x;
+				textures[1][offset][1] = lerpedColor.y;
+				textures[1][offset][2] = lerpedColor.z;
 
 				traversalValue /= diffTraversal;
 				lerpedColor = findLerpValue(traversalValue);
-				traversalTexture[offset][0] = lerpedColor.x;
-				traversalTexture[offset][1] = lerpedColor.y;
-				traversalTexture[offset][2] = lerpedColor.z;
+				textures[2][offset][0] = lerpedColor.x;
+				textures[2][offset][1] = lerpedColor.y;
+				textures[2][offset][2] = lerpedColor.z;
 
 				combinedValue /=  diffCombined;
 				lerpedColor = findLerpValue(combinedValue);
-				combinedTexture[offset][0] = lerpedColor.x;
-				combinedTexture[offset][1] = lerpedColor.y;
-				combinedTexture[offset][2] = lerpedColor.z;
+				textures[3][offset][0] = lerpedColor.x;
+				textures[3][offset][1] = lerpedColor.y;
+				textures[3][offset][2] = lerpedColor.z;
 			}
 		}
 	}

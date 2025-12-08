@@ -13,7 +13,7 @@ private:
     const char* vertexShaderSource;
     const char* fragmentShaderSource;
     // Texture
-    unsigned char texture[WIDTH * HEIGHT][3];
+    int textureIndex;
 
 public:
     openGlWrapper() : shaderProgram(0), VBO(0), VAO(0),
@@ -146,14 +146,14 @@ public:
         // Change texture
         glBindTexture(GL_TEXTURE_2D, textureColorBuffer); // Was already bound
         glTexSubImage2D(GL_TEXTURE_2D,
-            0,                      // (Mip-map) level
-            0,                      // x Offset
-            0,                      // y Offset
-            WIDTH,                  // Width
-            HEIGHT,                 // Height
-            GL_RGB,                 // Format
-            GL_UNSIGNED_BYTE,       // Type
-            (GLvoid*) texture       // Pixels
+            0,                              // (Mip-map) level
+            0,                              // x Offset
+            0,                              // y Offset
+            WIDTH,                          // Width
+            HEIGHT,                         // Height
+            GL_RGB,                         // Format
+            GL_UNSIGNED_BYTE,               // Type
+            (GLvoid*)textures[textureIndex] // Pixels
         );
 
         // Render texture
@@ -165,13 +165,8 @@ public:
         //glBindVertexArray(0);
     }
 
-    // ugly but works
-    void changeTexture(unsigned char tex[WIDTH * HEIGHT][3]) {
-        for (unsigned int i = 0; i < WIDTH * HEIGHT; i++) {
-            texture[i][0] = tex[i][0];
-            texture[i][1] = tex[i][1];
-            texture[i][2] = tex[i][2];
-        }
+    void setTextureIndex(int idx) {
+        textureIndex = idx;
     }
 
     void deAllcoate() {

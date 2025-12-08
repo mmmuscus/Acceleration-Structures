@@ -132,15 +132,15 @@ public:
 
 				unsigned int offset = j * WIDTH + i;
 				if (r.t < 1e30f) {
-					renderTexture[offset][0] = 255;
-					renderTexture[offset][1] = 255;
-					renderTexture[offset][2] = 255;
+					textures[0][offset][0] = 255;
+					textures[0][offset][1] = 255;
+					textures[0][offset][2] = 255;
 				}
 				else
 				{
-					renderTexture[offset][0] = 0;
-					renderTexture[offset][1] = 0;
-					renderTexture[offset][2] = 0;
+					textures[0][offset][0] = 0;
+					textures[0][offset][1] = 0;
+					textures[0][offset][2] = 0;
 				}
 			}
 		}

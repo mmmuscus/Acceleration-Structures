@@ -46,7 +46,7 @@ int main()
     // BVH render
     sc.spinCamera(1.0f);
     sc.render(bvh, true);
-    openGlW.changeTexture(combinedTexture);
+    openGlW.setTextureIndex(3);
     glfwW.resizeGLFW();
     openGlW.render();
     imGuiW.render();
