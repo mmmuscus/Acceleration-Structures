@@ -123,14 +123,12 @@ public:
 		stepCounter.calculateValues();
 		stepCounter.print();
 		
-		
+		// intersection tests !!!
 		unsigned int diff = stepCounter.max.intersectionTests - stepCounter.min.intersectionTests;
-
-		/*
 		for (int j = 0; j < HEIGHT; j++) { // ROWS
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
 				unsigned int greyValue = 
-					stepCounter.steps[j][i].traversalSteps - stepCounter.min.intersectionTests;
+					stepCounter.steps[j][i].intersectionTests - stepCounter.min.intersectionTests;
 				greyValue *= 255;
 				greyValue /= diff;
 
@@ -140,7 +138,22 @@ public:
 				screenTexture[offset][2] = greyValue;
 			}
 		}
-		*/
+
+		// traversal steps !!!
+		diff = stepCounter.max.traversalSteps - stepCounter.min.traversalSteps;
+		for (int j = 0; j < HEIGHT; j++) { // ROWS
+			for (int i = 0; i < WIDTH; i++) { // COLUMNS
+				unsigned int greyValue =
+					stepCounter.steps[j][i].traversalSteps - stepCounter.min.traversalSteps;
+				greyValue *= 255;
+				greyValue /= diff;
+
+				unsigned int offset = j * WIDTH + i;
+				screenTexture[offset][0] = greyValue;
+				screenTexture[offset][1] = greyValue;
+				screenTexture[offset][2] = greyValue;
+			}
+		}
 	}
 };
 
