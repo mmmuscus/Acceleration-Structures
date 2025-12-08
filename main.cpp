@@ -44,16 +44,18 @@ int main()
     bvh.buildBVH();
 
     // BVH render static
+    /*
     float staticAngle = 270.0f;
     sc.spinCamera(staticAngle * M_PI / 180.0f);
     sc.render(bvh, true);
-    openGlW.setTextureIndex(2);
+    openGlW.setTextureIndex(3);
     glfwW.resizeGLFW();
     openGlW.render();
     glfwW.swapBuffers();
+    */
 
     // BVH render spinning
-    /*openGlW.setTextureIndex(3);
+    openGlW.setTextureIndex(3);
     for (angle = 0; angle < ANGLES; angle++) {
         std::cout << "Rendering scene with " << angle << " degree rotation around the y axis." << std::endl;
         sc.spinCamera((float)angle * M_PI / 180.0f);
@@ -61,9 +63,9 @@ int main()
         glfwW.resizeGLFW();
         openGlW.render();
         glfwW.swapBuffers();
-    }*/
+    }
 
-    //printMCSV();
+    printMCSV();
     
     // Normal render
     // intersection tests per pixel: number of triangles
