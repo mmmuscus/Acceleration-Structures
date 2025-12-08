@@ -45,8 +45,9 @@ int main()
 
     // BVH render
     sc.render(bvh, true);
+    openGlW.changeTexture(combinedTexture);
     glfwW.resizeGLFW();
-    openGlW.render((GLvoid*)traversalTexture);
+    openGlW.render();
     imGuiW.render();
     glfwW.swapBuffers();
 
@@ -64,7 +65,7 @@ int main()
     while (!glfwWindowShouldClose(glfwW.getWindow()))
     {
         glfwW.resizeGLFW();
-        openGlW.render((GLvoid*)traversalTexture);
+        openGlW.render();
         imGuiW.render();
         glfwW.swapBuffers();
     }
