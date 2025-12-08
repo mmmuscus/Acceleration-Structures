@@ -44,7 +44,7 @@ int main()
     bvh.buildBVH();
 
     // BVH render
-    sc.spinCamera(1.0f);
+    sc.spinCamera(4.9f);
     sc.render(bvh, true);
     openGlW.setTextureIndex(3);
     glfwW.resizeGLFW();

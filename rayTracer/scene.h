@@ -88,7 +88,7 @@ public:
 	}
 
 	// Guided by https://stackoverflow.com/questions/50473848/rotate-point-around-pivot-point-repeatedly
-	// Only rotates coordinates x and y, z should not change for our use case
+	// Only rotates coordinates x and z, y should not change for our use case
 	void spinCamera(float rad) {
 		camera = spinPoint(rad, ogCamera);
 		topRight = spinPoint(rad, ogTopRight);
@@ -100,10 +100,10 @@ public:
 		float cosTheta = cos(rad);
 		float sinTheta = sin(rad);
 
-		float x = (cosTheta * (point.x - pivot.x) - sinTheta * (point.y - pivot.y) + pivot.x);
-		float y = (sinTheta * (point.x - pivot.x) + cosTheta * (point.y - pivot.y) + pivot.y);
+		float z = (cosTheta * (point.z - pivot.z) - sinTheta * (point.x - pivot.x) + pivot.z);
+		float x = (sinTheta * (point.z - pivot.z) + cosTheta * (point.x - pivot.x) + pivot.x);
 	
-		return glm::vec3(x, y, point.z);
+		return glm::vec3(x, point.y, z);
 	}
 
 	void render(BVH& bvh, bool useBVH) {

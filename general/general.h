@@ -47,6 +47,8 @@ unsigned char textures[4][WIDTH * HEIGHT][3];
 // 2: Traversal Texture
 // 3: Combined Texture
 
+# define M_PI           3.14159265358979323846  /* pi */
+
 unsigned int TRIANGLE_COUNT = 64;
 
 #define TINYOBJLOADER_IMPLEMENTATION
