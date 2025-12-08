@@ -3,6 +3,11 @@
 
 #include "../general/general.h"
 
+struct step {
+	unsigned int intersectionTests;
+	unsigned int traversalSteps; 
+};
+
 class instrumentation {
 private:
 	unsigned int intersectionTests;
