@@ -151,7 +151,7 @@ public:
             HEIGHT,                 // Height
             GL_RGB,                 // Format
             GL_UNSIGNED_BYTE,       // Type
-            (GLvoid*)screenTexture  // Pixels
+            (GLvoid*)renderTexture  // Pixels
         );
 
         // Render texture

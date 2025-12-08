@@ -14,9 +14,9 @@ private:
 
 public:
 	scene(glm::vec3 _c) : camera(_c), 
-		topRight(glm::vec3(camera.x + 1.0f, camera.x + 1.0f, camera.z + 5.0f)),
-		topLeft(glm::vec3(camera.x - 1.0f, camera.x + 1.0f, camera.z + 5.0f)),
-		bottomLeft(glm::vec3(camera.x - 1.0f, camera.x - 1.0f, camera.z + 5.0f))
+		topRight(glm::vec3(camera.x + 1.0f, camera.x + 1.0f, camera.z + 4.0f)),
+		topLeft(glm::vec3(camera.x - 1.0f, camera.x + 1.0f, camera.z + 4.0f)),
+		bottomLeft(glm::vec3(camera.x - 1.0f, camera.x - 1.0f, camera.z + 4.0f))
 	{}
 
 	// Guided by: https://vulkan-tutorial.com/Loading_models
@@ -60,18 +60,18 @@ public:
 					attrib.vertices[3 * indices[3 * face_ind + 2].vertex_index + 2]
 				);
 				// Shift model down and flip it
-				prim.p0.y = 1.5f - prim.p0.y;
-				prim.p1.y = 1.5f - prim.p1.y;
-				prim.p2.y = 1.5f - prim.p2.y;
+				prim.p0.y = 1.5f - prim.p0.y + 2.0f;
+				prim.p1.y = 1.5f - prim.p1.y + 2.0f;
+				prim.p2.y = 1.5f - prim.p2.y + 2.0f;
 				prim.calculateCentroid();
 
 				prims.push_back(prim);
 
 				// Triangle for second teapot
 				triangle prim2 = prim;
-				prim2.p0 += glm::vec3(1.5f, 1.5f, 1.5f);
-				prim2.p1 += glm::vec3(1.5f, 1.5f, 1.5f);
-				prim2.p2 += glm::vec3(1.5f, 1.5f, 1.5f);
+				prim2.p0 += glm::vec3(0.0f, -4.0f, 0.0f);
+				prim2.p1 += glm::vec3(0.0f, -4.0f, 0.0f);
+				prim2.p2 += glm::vec3(0.0f, -4.0f, 0.0f);
 				prim2.calculateCentroid();
 
 				prims.push_back(prim2);
@@ -89,7 +89,7 @@ public:
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
 				stepCounter.setHeightWidth(j, i);
 
-				glm::vec3 pixelWorldPos = topLeft + 
+				glm::vec3 pixelWorldPos = topLeft +
 					(bottomLeft - topLeft) * ((float)j / HEIGHT) +
 					(topRight - topLeft) * ((float)i / WIDTH);
 
@@ -106,52 +106,50 @@ public:
 				}
 
 				unsigned int offset = j * WIDTH + i;
-				if (r.t < 1e30f) { 
-					screenTexture[offset][0] = 255;
-					screenTexture[offset][1] = 255;
-					screenTexture[offset][2] = 255;
+				if (r.t < 1e30f) {
+					renderTexture[offset][0] = 255;
+					renderTexture[offset][1] = 255;
+					renderTexture[offset][2] = 255;
 				}
 				else
 				{
-					screenTexture[offset][0] = 0;
-					screenTexture[offset][1] = 0;
-					screenTexture[offset][2] = 0;
+					renderTexture[offset][0] = 0;
+					renderTexture[offset][1] = 0;
+					renderTexture[offset][2] = 0;
 				}
 			}
 		}
 
 		stepCounter.calculateValues();
 		stepCounter.print();
-		
-		// intersection tests !!!
-		unsigned int diff = stepCounter.max.intersectionTests - stepCounter.min.intersectionTests;
+
+		unsigned int diffIntersection = stepCounter.max.intersectionTests - stepCounter.min.intersectionTests;
+		unsigned int diffTraversal = stepCounter.max.traversalSteps - stepCounter.min.traversalSteps;
+		unsigned int diffCombined = diffIntersection + diffTraversal;
 		for (int j = 0; j < HEIGHT; j++) { // ROWS
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
-				unsigned int greyValue = 
+				unsigned int offset = j * WIDTH + i;
+				
+				float intersectionValue =
 					stepCounter.steps[j][i].intersectionTests - stepCounter.min.intersectionTests;
-				greyValue *= 255;
-				greyValue /= diff;
-
-				unsigned int offset = j * WIDTH + i;
-				screenTexture[offset][0] = greyValue;
-				screenTexture[offset][1] = greyValue;
-				screenTexture[offset][2] = greyValue;
-			}
-		}
-
-		// traversal steps !!!
-		diff = stepCounter.max.traversalSteps - stepCounter.min.traversalSteps;
-		for (int j = 0; j < HEIGHT; j++) { // ROWS
-			for (int i = 0; i < WIDTH; i++) { // COLUMNS
-				unsigned int greyValue =
+				float traversalValue =
 					stepCounter.steps[j][i].traversalSteps - stepCounter.min.traversalSteps;
-				greyValue *= 255;
-				greyValue /= diff;
+				float combinedValue = intersectionValue + traversalValue;
 
-				unsigned int offset = j * WIDTH + i;
-				screenTexture[offset][0] = greyValue;
-				screenTexture[offset][1] = greyValue;
-				screenTexture[offset][2] = greyValue;
+				intersectionValue *= 255.0f / diffIntersection;
+				intersectionTexture[offset][0] = intersectionValue;
+				intersectionTexture[offset][1] = intersectionValue;
+				intersectionTexture[offset][2] = intersectionValue;
+
+				traversalValue *= 255.0f / diffTraversal;
+				traversalTexture[offset][0] = traversalValue;
+				traversalTexture[offset][1] = traversalValue;
+				traversalTexture[offset][2] = traversalValue;
+
+				combinedValue *= 255.0f / diffCombined;
+				combinedTexture[offset][0] = combinedValue;
+				combinedTexture[offset][1] = combinedValue;
+				combinedTexture[offset][2] = combinedValue;
 			}
 		}
 	}

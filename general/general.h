@@ -40,8 +40,11 @@ const unsigned int WIDTH = 400;
 const unsigned int HEIGHT = 400;
 
 // idx 0: WIDTH
-// idx 1: HEIGHT	0
-unsigned char screenTexture[WIDTH * HEIGHT][3];
+// idx 1: HEIGHT
+unsigned char renderTexture[WIDTH * HEIGHT][3];
+unsigned char intersectionTexture[WIDTH * HEIGHT][3];
+unsigned char traversalTexture[WIDTH * HEIGHT][3];
+unsigned char combinedTexture[WIDTH * HEIGHT][3];
 
 unsigned int TRIANGLE_COUNT = 64;
 

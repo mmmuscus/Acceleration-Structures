@@ -3,14 +3,12 @@
 #include "general/imGuiWrapper.h"
 #include "general/openGlWrapper.h"
 
-#include "rayTracer/renderer.h"
 #include "rayTracer/scene.h"
 
 #include "accelerationStructures/BVH.h"
 
 glfwWrapper glfwW;
 openGlWrapper openGlW;
-renderer rayTracer;
 scene sc(glm::vec3(0.05f, 0.05f, -18.0f));
 
 int main()
