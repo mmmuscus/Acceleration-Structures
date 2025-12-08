@@ -84,17 +84,15 @@ public:
 		avg.intersectionTests = intersectionTestsSum / (WIDTH * HEIGHT);
 	}
 	void printIntersection() {
-		std::cout << "Intersection test measurements: " << std::endl;
-		std::cout << "MAX: " << max.intersectionTests << std::endl;
-		std::cout << "AVG: " << avg.intersectionTests << std::endl;
-		std::cout << "MIN: " << min.intersectionTests << std::endl;
+		std::cout << "Intersection tests MAX: " << max.intersectionTests << std::endl;
+		std::cout << "Intersection tests AVG: " << avg.intersectionTests << std::endl;
+		std::cout << "Intersection tests MIN: " << min.intersectionTests << std::endl;
 	}
 
 	void printTraversal() {
-		std::cout << "Traversal step measurements: " << std::endl;
-		std::cout << "MAX: " << max.traversalSteps << std::endl;
-		std::cout << "AVG: " << avg.traversalSteps << std::endl;
-		std::cout << "MIN: " << min.traversalSteps << std::endl;
+		std::cout << "Traversal steps MAX: " << max.traversalSteps << std::endl;
+		std::cout << "Traversal steps AVG: " << avg.traversalSteps << std::endl;
+		std::cout << "Traversal steps MIN: " << min.traversalSteps << std::endl;
 	}
 
 	void print() {

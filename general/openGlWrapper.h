@@ -165,6 +165,7 @@ public:
         //glBindVertexArray(0);
     }
 
+    // ugly but works
     void changeTexture(unsigned char tex[WIDTH * HEIGHT][3]) {
         for (unsigned int i = 0; i < WIDTH * HEIGHT; i++) {
             texture[i][0] = tex[i][0];
