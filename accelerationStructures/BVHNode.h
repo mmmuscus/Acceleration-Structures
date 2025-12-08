@@ -51,7 +51,7 @@ public:
 		float tz1 = (AABBmin.z - r.O.z) / r.D.z;
 		float tz2 = (AABBmax.z - r.O.z) / r.D.z;
 		tMin = fmaxf(tMin, fminf(tz1, tz2));
-		tMax = fmaxf(tMax, fmaxf(tz1, tz2));
+		tMax = fminf(tMax, fmaxf(tz1, tz2));
 
 		return (tMax >= tMin) && (tMin < r.t) && (tMax > 0.0f);
 	}

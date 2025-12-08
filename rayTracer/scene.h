@@ -122,6 +122,23 @@ public:
 
 		stepCounter.calculateValues();
 		stepCounter.print();
+		
+		
+		unsigned int diff = stepCounter.max.intersectionTests - stepCounter.min.intersectionTests;
+
+		for (int j = 0; j < HEIGHT; j++) { // ROWS
+			for (int i = 0; i < WIDTH; i++) { // COLUMNS
+				unsigned int greyValue = 
+					stepCounter.steps[j][i].traversalSteps - stepCounter.min.intersectionTests;
+				greyValue *= 255;
+				greyValue /= diff;
+
+				unsigned int offset = j * WIDTH + i;
+				screenTexture[offset][0] = greyValue;
+				screenTexture[offset][1] = greyValue;
+				screenTexture[offset][2] = greyValue;
+			}
+		}
 	}
 };
 

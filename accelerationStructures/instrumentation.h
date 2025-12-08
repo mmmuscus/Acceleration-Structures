@@ -10,14 +10,13 @@ struct step {
 
 class instrumentation {
 private:
-	step steps[HEIGHT][WIDTH];
-
 	unsigned int currentHeight;
 	unsigned int currentWidth;
 
+public:
+	step steps[HEIGHT][WIDTH];
 	step min, avg, max;
 
-public:
 	instrumentation() : currentHeight(0), currentWidth(0),
 		min(0), avg(0), max(0)
 	{
@@ -76,15 +75,15 @@ public:
 	void printIntersection() {
 		std::cout << "Intersection test measurements: " << std::endl;
 		std::cout << "MAX: " << max.intersectionTests << std::endl;
-		std::cout << "AVG: " << min.intersectionTests << std::endl;
-		std::cout << "MIN: " << avg.intersectionTests << std::endl;
+		std::cout << "AVG: " << avg.intersectionTests << std::endl;
+		std::cout << "MIN: " << min.intersectionTests << std::endl;
 	}
 
 	void printTraversal() {
 		std::cout << "Traversal step measurements: " << std::endl;
 		std::cout << "MAX: " << max.traversalSteps << std::endl;
-		std::cout << "AVG: " << min.traversalSteps << std::endl;
-		std::cout << "MIN: " << avg.traversalSteps << std::endl;
+		std::cout << "AVG: " << avg.traversalSteps << std::endl;
+		std::cout << "MIN: " << min.traversalSteps << std::endl;
 	}
 
 	void print() {

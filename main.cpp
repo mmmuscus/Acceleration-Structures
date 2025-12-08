@@ -45,22 +45,30 @@ int main()
     BVH bvh;
     bvh.buildBVH();
 
+    // BBVH render
     sc.render(bvh, true);
     glfwW.resizeGLFW();
     openGlW.render();
     imGuiW.render();
     glfwW.swapBuffers();
 
+    // Normal render
+    // intersection tests per pixel: number of triangles
+    /*
+    sc.render(bvh, false);
     glfwW.resizeGLFW();
     openGlW.render();
     imGuiW.render();
     glfwW.swapBuffers();
-    sc.render(bvh, false);
+    */
 
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))
     {
-        ;
+        glfwW.resizeGLFW();
+        openGlW.render();
+        imGuiW.render();
+        glfwW.swapBuffers();
     }
 
     // Cleanup
