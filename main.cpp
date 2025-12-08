@@ -12,7 +12,6 @@ glfwWrapper glfwW;
 openGlWrapper openGlW;
 renderer rayTracer;
 scene sc(glm::vec3(0.0f, 0.0f, -18.0f));
-BVH bvh;
 
 int main()
 {
@@ -77,17 +76,21 @@ int main()
                 attrib.vertices[3 * indices[3 * face_ind + 2].vertex_index + 1],
                 attrib.vertices[3 * indices[3 * face_ind + 2].vertex_index + 2]
             );
+            // Shift model down and flip it
+            prim.p0.y = 1.5f - prim.p0.y;
+            prim.p1.y = 1.5f - prim.p1.y;
+            prim.p2.y = 1.5f - prim.p2.y;
             prim.calculateCentroid();
 
             prims.push_back(prim);
         }
     }
 
-    // Scene
-    //sc.initScene();
+    TRIANGLE_COUNT = prims.size();
     std::cout << "Scene successfully populated" << std::endl;
 
     // Build BVH
+    BVH bvh;
     bvh.buildBVH();
 
     sc.render(bvh, true);
@@ -101,6 +104,8 @@ int main()
         glfwW.swapBuffers();
 
         sc.render(bvh, false);
+
+        std::cout << "Scene successfully populated" << std::endl;
     }
 
     // Cleanup
