@@ -13,12 +13,21 @@ private:
 	unsigned int currentHeight;
 	unsigned int currentWidth;
 
-public:
 	step steps[HEIGHT][WIDTH];
 	step min, avg, max;
 
+	glm::vec3 startColor;
+	glm::vec3 endColor;
+
+public:
 	instrumentation() : currentHeight(0), currentWidth(0),
-		min(0), avg(0), max(0)
+		min(0), avg(0), max(0),
+		startColor(glm::vec3( // Used when min value
+			56.0f, 6.0f, 89.0f
+		)),
+		endColor(glm::vec3( // Used when max value
+			252.0f, 101.0f, 13.0f
+		))
 	{
 		reset();
 	}
@@ -91,6 +100,47 @@ public:
 	void print() {
 		printIntersection();
 		printTraversal();
+	}
+
+	void createTextures() {
+		unsigned int diffIntersection = max.intersectionTests - min.intersectionTests;
+		unsigned int diffTraversal = max.traversalSteps - min.traversalSteps;
+		unsigned int diffCombined = diffIntersection + diffTraversal;
+		for (int j = 0; j < HEIGHT; j++) { // ROWS
+			for (int i = 0; i < WIDTH; i++) { // COLUMNS
+				unsigned int offset = j * WIDTH + i;
+
+				float intersectionValue = 
+					steps[j][i].intersectionTests - min.intersectionTests;
+				float traversalValue =
+					steps[j][i].traversalSteps - min.traversalSteps;
+				float combinedValue = intersectionValue + traversalValue;
+
+				intersectionValue /= diffIntersection;
+				glm::vec3 lerpedColor = findLerpValue(intersectionValue);
+				intersectionTexture[offset][0] = lerpedColor.x;
+				intersectionTexture[offset][1] = lerpedColor.y;
+				intersectionTexture[offset][2] = lerpedColor.z;
+
+				traversalValue /= diffTraversal;
+				lerpedColor = findLerpValue(traversalValue);
+				traversalTexture[offset][0] = lerpedColor.x;
+				traversalTexture[offset][1] = lerpedColor.y;
+				traversalTexture[offset][2] = lerpedColor.z;
+
+				combinedValue /=  diffCombined;
+				lerpedColor = findLerpValue(combinedValue);
+				combinedTexture[offset][0] = lerpedColor.x;
+				combinedTexture[offset][1] = lerpedColor.y;
+				combinedTexture[offset][2] = lerpedColor.z;
+			}
+		}
+	}
+
+	glm::vec3 findLerpValue(float val) {
+		return glm::vec3(
+			startColor * (1.0f - val) + endColor * val
+		);
 	}
 };
 

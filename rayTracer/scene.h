@@ -122,36 +122,7 @@ public:
 
 		stepCounter.calculateValues();
 		stepCounter.print();
-
-		unsigned int diffIntersection = stepCounter.max.intersectionTests - stepCounter.min.intersectionTests;
-		unsigned int diffTraversal = stepCounter.max.traversalSteps - stepCounter.min.traversalSteps;
-		unsigned int diffCombined = diffIntersection + diffTraversal;
-		for (int j = 0; j < HEIGHT; j++) { // ROWS
-			for (int i = 0; i < WIDTH; i++) { // COLUMNS
-				unsigned int offset = j * WIDTH + i;
-				
-				float intersectionValue =
-					stepCounter.steps[j][i].intersectionTests - stepCounter.min.intersectionTests;
-				float traversalValue =
-					stepCounter.steps[j][i].traversalSteps - stepCounter.min.traversalSteps;
-				float combinedValue = intersectionValue + traversalValue;
-
-				intersectionValue *= 255.0f / diffIntersection;
-				intersectionTexture[offset][0] = intersectionValue;
-				intersectionTexture[offset][1] = intersectionValue;
-				intersectionTexture[offset][2] = intersectionValue;
-
-				traversalValue *= 255.0f / diffTraversal;
-				traversalTexture[offset][0] = traversalValue;
-				traversalTexture[offset][1] = traversalValue;
-				traversalTexture[offset][2] = traversalValue;
-
-				combinedValue *= 255.0f / diffCombined;
-				combinedTexture[offset][0] = combinedValue;
-				combinedTexture[offset][1] = combinedValue;
-				combinedTexture[offset][2] = combinedValue;
-			}
-		}
+		stepCounter.createTextures();
 	}
 };
 
