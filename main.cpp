@@ -44,13 +44,15 @@ int main()
     bvh.buildBVH();
 
     // BVH render
-    sc.spinCamera(4.9f);
-    sc.render(bvh, true);
-    openGlW.setTextureIndex(0);
-    glfwW.resizeGLFW();
-    openGlW.render();
-    imGuiW.render();
-    glfwW.swapBuffers();
+    for (int angle = 0; angle < 5; angle++) {
+        sc.spinCamera((float)angle * M_PI / 180.0f);
+        sc.render(bvh, true);
+        openGlW.setTextureIndex(0);
+        glfwW.resizeGLFW();
+        openGlW.render();
+        imGuiW.render();
+        glfwW.swapBuffers();
+    }
 
     // Normal render
     // intersection tests per pixel: number of triangles

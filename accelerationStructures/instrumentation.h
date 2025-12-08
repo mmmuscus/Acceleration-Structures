@@ -8,6 +8,12 @@ struct step {
 	unsigned int traversalSteps; 
 };
 
+struct measurements {
+	step angle, min, avg, max;
+};
+
+measurements m[360];
+
 class instrumentation {
 private:
 	unsigned int currentHeight;
@@ -82,6 +88,8 @@ public:
 
 		avg.traversalSteps = traversalStepSum / (WIDTH * HEIGHT);
 		avg.intersectionTests = intersectionTestsSum / (WIDTH * HEIGHT);
+
+
 	}
 	void printIntersection() {
 		std::cout << "Intersection tests MAX: " << max.intersectionTests << std::endl;
