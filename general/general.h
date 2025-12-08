@@ -36,8 +36,8 @@ std::mt19937 rng(dev());
 std::uniform_real_distribution<float> dt(-10.0f, 10.0f);
 // Random nubmer for distribution -5 - 5 by calling dt(rng)
 
-const unsigned int WIDTH = 900;
-const unsigned int HEIGHT = 900;
+const unsigned int WIDTH = 800;
+const unsigned int HEIGHT = 800;
 
 // idx 0: WIDTH
 // idx 1: HEIGHT

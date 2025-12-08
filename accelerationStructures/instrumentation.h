@@ -58,10 +58,10 @@ public:
 	instrumentation() : currentHeight(0), currentWidth(0),
 		min(0), avg(0), max(0),
 		startColor(glm::vec3( // Used when min value
-			56.0f, 6.0f, 89.0f
+			0.0f, 0.0f, 0.0f
 		)),
 		endColor(glm::vec3( // Used when max value
-			252.0f, 101.0f, 13.0f
+			255.0f, 255.0f, 255.0f
 		))
 	{
 		reset();
@@ -166,11 +166,14 @@ public:
 				textures[2][offset][1] = lerpedColor.y;
 				textures[2][offset][2] = lerpedColor.z;
 
+
 				combinedValue /=  diffCombined;
 				lerpedColor = findLerpValue(combinedValue);
-				textures[3][offset][0] = lerpedColor.x;
-				textures[3][offset][1] = lerpedColor.y;
-				textures[3][offset][2] = lerpedColor.z;
+				textures[3][offset][0] = 
+					startColor.y * (1.0f - intersectionValue) + endColor.y * intersectionValue;
+				textures[3][offset][1] = 
+					startColor.x * (1.0f - traversalValue) + endColor.x * traversalValue;
+				textures[3][offset][2] = 0;
 			}
 		}
 	}
