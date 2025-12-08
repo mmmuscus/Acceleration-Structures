@@ -9,14 +9,20 @@
 
 class scene {
 private:
+	glm::vec3 ogCamera;
+	glm::vec3 ogTopRight, ogTopLeft, ogBottomLeft;
+	glm::vec3 pivot;
+
 	glm::vec3 camera;
 	glm::vec3 topRight, topLeft, bottomLeft; // from perspective of camera
 
 public:
-	scene(glm::vec3 _c) : camera(_c), 
-		topRight(glm::vec3(camera.x + 1.0f, camera.x + 1.0f, camera.z + 4.0f)),
-		topLeft(glm::vec3(camera.x - 1.0f, camera.x + 1.0f, camera.z + 4.0f)),
-		bottomLeft(glm::vec3(camera.x - 1.0f, camera.x - 1.0f, camera.z + 4.0f))
+	scene(glm::vec3 _c) : ogCamera(_c), pivot(glm::vec3(0.0f, 0.0f, 0.0f)),
+		ogTopRight(glm::vec3(ogCamera.x + 1.0f, ogCamera.x + 1.0f, ogCamera.z + 4.0f)),
+		ogTopLeft(glm::vec3(ogCamera.x - 1.0f, ogCamera.x + 1.0f, ogCamera.z + 4.0f)),
+		ogBottomLeft(glm::vec3(ogCamera.x - 1.0f, ogCamera.x - 1.0f, ogCamera.z + 4.0f)),
+		camera(ogCamera), 
+		topRight(ogTopRight), topLeft(ogTopLeft), bottomLeft(ogBottomLeft)
 	{}
 
 	// Guided by: https://vulkan-tutorial.com/Loading_models
@@ -79,6 +85,25 @@ public:
 		}
 
 		TRIANGLE_COUNT = prims.size();
+	}
+
+	// Guided by https://stackoverflow.com/questions/50473848/rotate-point-around-pivot-point-repeatedly
+	// Only rotates coordinates x and y, z should not change for our use case
+	void spinCamera(float rad) {
+		camera = spinPoint(rad, ogCamera);
+		topRight = spinPoint(rad, ogTopRight);
+		topLeft = spinPoint(rad, ogTopLeft);
+		bottomLeft = spinPoint(rad, ogBottomLeft);
+	}
+
+	glm::vec3 spinPoint(float rad, glm::vec3 point) {
+		float cosTheta = cos(rad);
+		float sinTheta = sin(rad);
+
+		float x = (cosTheta * (point.x - pivot.x) - sinTheta * (point.y - pivot.y) + pivot.x);
+		float y = (sinTheta * (point.x - pivot.x) + cosTheta * (point.y - pivot.y) + pivot.y);
+	
+		return glm::vec3(x, y, point.z);
 	}
 
 	void render(BVH& bvh, bool useBVH) {
