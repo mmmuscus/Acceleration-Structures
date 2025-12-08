@@ -14,9 +14,9 @@ private:
 
 public:
 	scene(glm::vec3 _c) : camera(_c), 
-		topRight(glm::vec3(1.0f, 1.0f, camera.z + 5.0f)),
-		topLeft(glm::vec3(-1.0f, 1.0f, camera.z + 5.0f)),
-		bottomLeft(glm::vec3(-1.0f, -1.0f, camera.z + 5.0f))
+		topRight(glm::vec3(camera.x + 1.0f, camera.x + 1.0f, camera.z + 5.0f)),
+		topLeft(glm::vec3(camera.x - 1.0f, camera.x + 1.0f, camera.z + 5.0f)),
+		bottomLeft(glm::vec3(camera.x - 1.0f, camera.x - 1.0f, camera.z + 5.0f))
 	{}
 
 	// Guided by: https://vulkan-tutorial.com/Loading_models
@@ -126,6 +126,7 @@ public:
 		
 		unsigned int diff = stepCounter.max.intersectionTests - stepCounter.min.intersectionTests;
 
+		/*
 		for (int j = 0; j < HEIGHT; j++) { // ROWS
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
 				unsigned int greyValue = 
@@ -139,6 +140,7 @@ public:
 				screenTexture[offset][2] = greyValue;
 			}
 		}
+		*/
 	}
 };
 

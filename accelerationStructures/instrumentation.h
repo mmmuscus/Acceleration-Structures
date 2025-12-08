@@ -47,6 +47,8 @@ public:
 
 	void calculateValues() {
 		max.traversalSteps = steps[0][0].traversalSteps;
+		max.intersectionTests = steps[0][0].intersectionTests;
+		min.traversalSteps = steps[0][0].traversalSteps;
 		min.intersectionTests = steps[0][0].intersectionTests;
 
 		unsigned int traversalStepSum = 0;
