@@ -150,7 +150,7 @@ public:
 		}
 
 		stepCounter.calculateValues();
-		stepCounter.print();
+		//stepCounter.print();
 		stepCounter.createTextures();
 	}
 };

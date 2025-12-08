@@ -8,11 +8,40 @@ struct step {
 	unsigned int traversalSteps; 
 };
 
+int angle;
+
 struct measurements {
-	step angle, min, avg, max;
+	step min, avg, max;
 };
 
-measurements m[360];
+measurements m[ANGLES];
+
+void printMTraversalCSV() {
+	std::cout << "Traversal steps per angle: " << std::endl;
+	for (int i = 0; i < ANGLES; i++) {
+		std::cout << i << ", "
+			<< m[i].min.traversalSteps << ", "
+			<< m[i].avg.traversalSteps << ", "
+			<< m[i].max.traversalSteps
+			<< std::endl;
+	}
+}
+
+void printMIntersectionCSV() {
+	std::cout << "Intersection tests per angle: " << std::endl;
+	for (int i = 0; i < ANGLES; i++) {
+		std::cout << i << ", "
+			<< m[i].min.intersectionTests << ", "
+			<< m[i].avg.intersectionTests << ", "
+			<< m[i].max.intersectionTests
+			<< std::endl;
+	}
+}
+
+void printMCSV() {
+	printMIntersectionCSV();
+	printMTraversalCSV();
+}
 
 class instrumentation {
 private:
@@ -89,7 +118,10 @@ public:
 		avg.traversalSteps = traversalStepSum / (WIDTH * HEIGHT);
 		avg.intersectionTests = intersectionTestsSum / (WIDTH * HEIGHT);
 
-
+		// Update plot values
+		m[angle].min = min;
+		m[angle].avg = avg;
+		m[angle].max = max;
 	}
 	void printIntersection() {
 		std::cout << "Intersection tests MAX: " << max.intersectionTests << std::endl;

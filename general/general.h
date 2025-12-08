@@ -48,6 +48,7 @@ unsigned char textures[4][WIDTH * HEIGHT][3];
 // 3: Combined Texture
 
 # define M_PI           3.14159265358979323846  /* pi */
+const int ANGLES = 360;
 
 unsigned int TRIANGLE_COUNT = 64;
 
