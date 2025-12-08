@@ -43,10 +43,10 @@ int main()
     BVH bvh;
     bvh.buildBVH();
 
-    // BBVH render
+    // BVH render
     sc.render(bvh, true);
     glfwW.resizeGLFW();
-    openGlW.render();
+    openGlW.render((GLvoid*)traversalTexture);
     imGuiW.render();
     glfwW.swapBuffers();
 
@@ -64,7 +64,7 @@ int main()
     while (!glfwWindowShouldClose(glfwW.getWindow()))
     {
         glfwW.resizeGLFW();
-        openGlW.render();
+        openGlW.render((GLvoid*)traversalTexture);
         imGuiW.render();
         glfwW.swapBuffers();
     }

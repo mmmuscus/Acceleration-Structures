@@ -136,7 +136,7 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void render() {
+    void render(GLvoid* texture) {
         // Clear background (redundant cos we render a texture)
         glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.z);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -151,7 +151,7 @@ public:
             HEIGHT,                 // Height
             GL_RGB,                 // Format
             GL_UNSIGNED_BYTE,       // Type
-            (GLvoid*)renderTexture  // Pixels
+            texture  // Pixels
         );
 
         // Render texture
