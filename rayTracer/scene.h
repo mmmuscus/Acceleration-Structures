@@ -132,9 +132,13 @@ public:
 
 				unsigned int offset = j * WIDTH + i;
 				if (r.t < 1e30f) {
-					textures[0][offset][0] = 255;
-					textures[0][offset][1] = 255;
-					textures[0][offset][2] = 255;
+					glm::vec3 hitPoint = r.O + (r.t * r.D);
+					float rComp = (hitPoint.x + 5.0f) * 255.0f / 10.0f;
+					float gComp = (hitPoint.y + 5.0f) * 255.0f / 10.0f;
+
+					textures[0][offset][0] = rComp;
+					textures[0][offset][1] = gComp;
+					textures[0][offset][2] = 128;
 				}
 				else
 				{
