@@ -1,4 +1,4 @@
-#ifndef BVH_NODE_H_
+#ifndef BVH_NODE_H
 #define BVH_NODE_H_
 
 #include "../general/general.h"
@@ -6,16 +6,36 @@
 #include "../rayTracer/triangle.h"
 #include "../rayTracer/ray.h"
 
+struct AABB {
+	glm::vec3 bMin = glm::vec3(1e30f, 1e30f, 1e30f);
+	glm::vec3 bMax = glm::vec3(-1e30f, -1e30f, -1e30f);
+
+	void grow(glm::vec3 p) {
+		bMin.x = fminf(bMin.x, p.x);
+		bMin.y = fminf(bMin.y, p.y);
+		bMin.z = fminf(bMin.z, p.z);
+
+		bMax.x = fmaxf(bMax.x, p.x);
+		bMax.y = fmaxf(bMax.x, p.y);
+		bMax.z = fmaxf(bMax.x, p.z);
+	}
+
+	float area() {
+		glm::vec3 extent = bMax - bMin;
+		return extent.x * extent.y + extent.y * extent.z + extent.z * extent.x;
+	}
+};
+
 class BVHNode {
 public:
-	glm::vec3 AABBmin, AABBmax;
+	AABB aabb;
+	//glm::vec3 AABBmin, AABBmax;
 	unsigned int leftFirst, primCount;
 
-	BVHNode() :
-		AABBmin(glm::vec3(1e30f, 1e30f, 1e30f)),
-		AABBmax(glm::vec3(-1e30f, -1e30f, -1e30f)),
-		leftFirst(0), primCount(0)
-	{}
+	BVHNode() : leftFirst(0), primCount(0) {
+		aabb.bMin = glm::vec3(1e30f, 1e30f, 1e30f);
+		aabb.bMax = glm::vec3(-1e30f, -1e30f, -1e30f);
+	}
 
 	void updateBounds() {
 		if (primCount == 0)
@@ -25,31 +45,31 @@ public:
 		for (int i = leftFirst; i < end; i++) {
 			glm::vec3 triMin = prims[i].min();
 			
-			AABBmin.x = fminf(AABBmin.x, triMin.x);
-			AABBmin.y = fminf(AABBmin.y, triMin.y);
-			AABBmin.z = fminf(AABBmin.z, triMin.z);
+			aabb.bMin.x = fminf(aabb.bMin.x, triMin.x);
+			aabb.bMin.y = fminf(aabb.bMin.y, triMin.y);
+			aabb.bMin.z = fminf(aabb.bMin.z, triMin.z);
 
 			glm::vec3 triMax = prims[i].max();
-			AABBmax.x = fmaxf(AABBmax.x, triMax.x);
-			AABBmax.y = fmaxf(AABBmax.y, triMax.y);
-			AABBmax.z = fmaxf(AABBmax.z, triMax.z);
+			aabb.bMax.x = fmaxf(aabb.bMax.x, triMax.x);
+			aabb.bMax.y = fmaxf(aabb.bMax.y, triMax.y);
+			aabb.bMax.z = fmaxf(aabb.bMax.z, triMax.z);
 		}
 	}
 
 	// Lifted from: https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 	bool intersectAABB(const ray& r) {
-		float tx1 = (AABBmin.x - r.O.x) / r.D.x;
-		float tx2 = (AABBmax.x - r.O.x) / r.D.x;
+		float tx1 = (aabb.bMin.x - r.O.x) / r.D.x;
+		float tx2 = (aabb.bMax.x - r.O.x) / r.D.x;
 		float tMin = fminf(tx1, tx2);
 		float tMax = fmaxf(tx1, tx2);
 
-		float ty1 = (AABBmin.y - r.O.y) / r.D.y;
-		float ty2 = (AABBmax.y - r.O.y) / r.D.y;
+		float ty1 = (aabb.bMin.y - r.O.y) / r.D.y;
+		float ty2 = (aabb.bMax.y - r.O.y) / r.D.y;
 		tMin = fmaxf(tMin, fminf(ty1, ty2));
 		tMax = fminf(tMax, fmaxf(ty1, ty2));
 
-		float tz1 = (AABBmin.z - r.O.z) / r.D.z;
-		float tz2 = (AABBmax.z - r.O.z) / r.D.z;
+		float tz1 = (aabb.bMin.z - r.O.z) / r.D.z;
+		float tz2 = (aabb.bMax.z - r.O.z) / r.D.z;
 		tMin = fmaxf(tMin, fminf(tz1, tz2));
 		tMax = fminf(tMax, fmaxf(tz1, tz2));
 

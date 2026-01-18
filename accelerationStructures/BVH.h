@@ -115,26 +115,49 @@ private:
 
 	void splitNaive(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
 		BVHNode& curr = nodes[idx];
-		glm::vec3 diff = curr.AABBmax - curr.AABBmin;
+		glm::vec3 diff = curr.aabb.bMax - curr.aabb.bMin;
 
 		if (diff.x >= diff.y && diff.x >= diff.z) {
 			splitAxis = 0;
-			splitPosition = curr.AABBmin.x + diff.x * 0.5f;
+			splitPosition = curr.aabb.bMin.x + diff.x * 0.5f;
 			return;
 		}
 
 		if (diff.y > diff.z) {
 			splitAxis = 1;
-			splitPosition = curr.AABBmin.y + diff.y * 0.5f;
+			splitPosition = curr.aabb.bMin.y + diff.y * 0.5f;
 		}
 		else {
 			splitAxis = 2;
-			splitPosition = curr.AABBmin.z + diff.z * 0.5f;
+			splitPosition = curr.aabb.bMin.z + diff.z * 0.5f;
 		}
 	}
 
 	void splitSAH(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
-		;
+		BVHNode& curr = nodes[idx];
+		int bestAxis = -1;
+		float bestPos = 0;
+		float bestCost = 1e30f;
+
+		for (int axis = 0; axis < 3; axis++) {
+			for (unsigned int i = 0; i < curr.primCount; i++) {
+				triangle& tri = prims[curr.leftFirst + i];
+				float candidatePos = tri.centroid[axis];
+				float cost = evaulateSAH(curr, axis, candidatePos);
+				if (cost < bestCost) {
+					bestPos = candidatePos;
+					bestAxis = axis;
+					bestCost = cost;
+				}
+			}
+		}
+
+		splitAxis = bestAxis;
+		splitPosition = bestPos;
+	}
+
+	float evaulateSAH(BVHNode curr, int axis, float pos) {
+		return 1e30f;
 	}
 };
 
