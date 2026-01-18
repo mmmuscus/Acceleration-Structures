@@ -34,7 +34,10 @@ public:
 
 		subdivide(0);
 
-		std::cout << "BVH successfully built" << std::endl;
+		if (type == NAIVE)
+			std::cout << "Naive BVH successfully built" << std::endl;
+		if (type == SAH)
+			std::cout << "SAH BVH successfully built" << std::endl;
 	}
 
 	void traverse(ray& r, unsigned int nodeIdx) {
@@ -58,20 +61,29 @@ public:
 
 private:
 	void subdivide(unsigned int nodeIdx) {
-		if (nodes[nodeIdx].primCount <= 3)
+		// Terminate recursion NAIVE
+		if (type == NAIVE && nodes[nodeIdx].primCount <= 3)
 			return;
 
 		unsigned int splitAxis;
 		float splitPosition;
 
+		BVHNode& curr = nodes[nodeIdx];
+
 		// Splitting
 		if (type == NAIVE)
 			splitNaive(nodeIdx, splitAxis, splitPosition);
+		if (type == SAH) {
+			if (nodes[nodeIdx].primCount <= 1)
+				return;
 
-		if (type == SAH)
-			splitSAH(nodeIdx, splitAxis, splitPosition);
+			float splitCost = splitSAH(nodeIdx, splitAxis, splitPosition);
+			float parentCost = curr.primCount * curr.aabb.area();
 
-		BVHNode& curr = nodes[nodeIdx];
+			// Terminate recursion SAH
+			if (splitCost >= parentCost)
+				return;
+		}
 
 		// Swap triangles around
 		unsigned int start = curr.leftFirst;
@@ -133,13 +145,13 @@ private:
 		}
 	}
 
-	void splitSAH(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
+	float splitSAH(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
 		BVHNode& curr = nodes[idx];
 		int bestAxis = -1;
 		float bestPos = 0;
 		float bestCost = 1e30f;
 
-		for (int axis = 0; axis < 3; axis++) {
+		for (unsigned int axis = 0; axis < 3; axis++) {
 			for (unsigned int i = 0; i < curr.primCount; i++) {
 				triangle& tri = prims[curr.leftFirst + i];
 				float candidatePos = tri.centroid[axis];
@@ -154,9 +166,36 @@ private:
 
 		splitAxis = bestAxis;
 		splitPosition = bestPos;
+		return bestCost;
 	}
 
-	float evaulateSAH(BVHNode curr, int axis, float pos) {
+	float evaulateSAH(BVHNode& curr, int axis, float pos) {
+		AABB firstBox, secondBox;
+		int firstCount = 0;
+		int secondCount = 0;
+
+		for (unsigned int i = 0; i < curr.primCount; i++) {
+			triangle& tri = prims[curr.leftFirst + i];
+
+			if (tri.centroid[axis] < pos) {
+				firstCount++;
+				firstBox.grow(tri.p0);
+				firstBox.grow(tri.p1);
+				firstBox.grow(tri.p2);
+			}
+			else
+			{
+				secondCount++;
+				secondBox.grow(tri.p0);
+				secondBox.grow(tri.p1);
+				secondBox.grow(tri.p2);
+			}
+		}
+
+		float cost = firstCount * firstBox.area() + secondCount * secondBox.area();
+		if (cost > 0)
+			return cost;
+
 		return 1e30f;
 	}
 };
