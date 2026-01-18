@@ -40,8 +40,8 @@ int main()
     std::cout << "Scene successfully populated" << std::endl;
 
     // Build BVH
-    BVH bvh;
-    bvh.buildBVH();
+    BVH naiveBvh = BVH(NAIVE);
+    naiveBvh.buildBVH();
 
     // BVH render static
     /*
@@ -59,7 +59,7 @@ int main()
     for (angle = 0; angle < ANGLES; angle++) {
         std::cout << "Rendering scene with " << angle << " degree rotation around the y axis." << std::endl;
         sc.spinCamera((float)angle * M_PI / 180.0f);
-        sc.render(bvh, true);
+        sc.render(naiveBvh, true);
         glfwW.resizeGLFW();
         openGlW.render();
         glfwW.swapBuffers();

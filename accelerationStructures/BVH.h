@@ -6,13 +6,20 @@
 #include "BVHNode.h"
 #include "instrumentation.h"
 
+enum BVHType {
+	NAIVE,
+	SAH
+};
+
 class BVH {
 private:
 	std::vector<BVHNode> nodes;
 	unsigned int nodesUsed;
 
+	BVHType type;
+
 public:
-	BVH() : nodesUsed(1) {
+	BVH(BVHType _type) : type(_type), nodesUsed(1) {
 		for (int i = 0; i < TRIANGLE_COUNT * 2 - 1; i++) {
 			BVHNode newNode;
 			nodes.push_back(newNode);
@@ -21,7 +28,7 @@ public:
 
 	void buildBVH() {
 		BVHNode& root = nodes[0];
-		root.leftFirst = 0; 
+		root.leftFirst = 0;
 		root.primCount = TRIANGLE_COUNT;
 		root.updateBounds();
 
@@ -57,7 +64,12 @@ private:
 		unsigned int splitAxis;
 		float splitPosition;
 
-		split(nodeIdx, splitAxis, splitPosition);
+		// Splitting
+		if (type == NAIVE)
+			splitNaive(nodeIdx, splitAxis, splitPosition);
+
+		if (type == SAH)
+			splitSAH(nodeIdx, splitAxis, splitPosition);
 
 		BVHNode& curr = nodes[nodeIdx];
 
@@ -101,7 +113,7 @@ private:
 		subdivide(rightIdx);
 	}
 
-	void split(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
+	void splitNaive(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
 		BVHNode& curr = nodes[idx];
 		glm::vec3 diff = curr.AABBmax - curr.AABBmin;
 
@@ -119,6 +131,10 @@ private:
 			splitAxis = 2;
 			splitPosition = curr.AABBmin.z + diff.z * 0.5f;
 		}
+	}
+
+	void splitSAH(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
+		;
 	}
 };
 
