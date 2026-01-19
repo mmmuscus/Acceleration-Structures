@@ -9,7 +9,7 @@
 
 glfwWrapper glfwW;
 openGlWrapper openGlW;
-scene sc(glm::vec3(0.05f, 0.05f, -18.0f));
+scene sc(glm::vec3(0.0f, 0.0f, -18.0f));
 
 int main()
 {
@@ -44,7 +44,7 @@ int main()
     naiveBvh.buildBVH();
 
     BVH SAHBvh = BVH(SAH);
-    SAHBvh.buildBVH();
+    //SAHBvh.buildBVH();
 
     // BVH render static
     /*
@@ -62,7 +62,7 @@ int main()
     for (angle = 0; angle < ANGLES; angle++) {
         std::cout << "Rendering scene with " << angle << " degree rotation around the y axis." << std::endl;
         sc.spinCamera((float)angle * M_PI / 180.0f);
-        sc.render(SAHBvh, true);
+        sc.render(naiveBvh, true);
         glfwW.resizeGLFW();
         openGlW.render();
         glfwW.swapBuffers();

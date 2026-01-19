@@ -6,24 +6,18 @@
 #include "../accelerationStructures/BVH.h"
 
 #include "triangle.h"
+#include "camera.h"
 
 class scene {
 private:
-	glm::vec3 ogCamera;
-	glm::vec3 ogTopRight, ogTopLeft, ogBottomLeft;
-	glm::vec3 pivot;
-
-	glm::vec3 camera;
-	glm::vec3 topRight, topLeft, bottomLeft; // from perspective of camera
+	camera cam;
 
 public:
-	scene(glm::vec3 _c) : ogCamera(_c), pivot(glm::vec3(0.0f, 0.0f, 0.0f)),
-		ogTopRight(glm::vec3(ogCamera.x + 1.0f, ogCamera.x + 1.0f, ogCamera.z + 4.0f)),
-		ogTopLeft(glm::vec3(ogCamera.x - 1.0f, ogCamera.x + 1.0f, ogCamera.z + 4.0f)),
-		ogBottomLeft(glm::vec3(ogCamera.x - 1.0f, ogCamera.x - 1.0f, ogCamera.z + 4.0f)),
-		camera(ogCamera), 
-		topRight(ogTopRight), topLeft(ogTopLeft), bottomLeft(ogBottomLeft)
-	{}
+	scene(glm::vec3 _c) : cam(camera(_c)) {}
+
+	void spinCamera(float rad) {
+		cam.spin(rad);
+	}
 
 	// Guided by: https://vulkan-tutorial.com/Loading_models
 	// Also by: https://github.com/canmom/rasteriser/blob/master/fileloader.cpp
@@ -73,37 +67,18 @@ public:
 
 				prims.push_back(prim);
 
-				// Triangle for second teapot
-				triangle prim2 = prim;
-				prim2.p0 += glm::vec3(0.0f, -4.0f, 0.0f);
-				prim2.p1 += glm::vec3(0.0f, -4.0f, 0.0f);
-				prim2.p2 += glm::vec3(0.0f, -4.0f, 0.0f);
-				prim2.calculateCentroid();
+				//// Triangle for second teapot
+				//triangle prim2 = prim;
+				//prim2.p0 += glm::vec3(0.0f, -4.0f, 0.0f);
+				//prim2.p1 += glm::vec3(0.0f, -4.0f, 0.0f);
+				//prim2.p2 += glm::vec3(0.0f, -4.0f, 0.0f);
+				//prim2.calculateCentroid();
 
-				prims.push_back(prim2);
+				//prims.push_back(prim2);
 			}
 		}
 
 		TRIANGLE_COUNT = prims.size();
-	}
-
-	// Guided by https://stackoverflow.com/questions/50473848/rotate-point-around-pivot-point-repeatedly
-	// Only rotates coordinates x and z, y should not change for our use case
-	void spinCamera(float rad) {
-		camera = spinPoint(rad, ogCamera);
-		topRight = spinPoint(rad, ogTopRight);
-		topLeft = spinPoint(rad, ogTopLeft);
-		bottomLeft = spinPoint(rad, ogBottomLeft);
-	}
-
-	glm::vec3 spinPoint(float rad, glm::vec3 point) {
-		float cosTheta = cos(rad);
-		float sinTheta = sin(rad);
-
-		float z = (cosTheta * (point.z - pivot.z) - sinTheta * (point.x - pivot.x) + pivot.z);
-		float x = (sinTheta * (point.z - pivot.z) + cosTheta * (point.x - pivot.x) + pivot.x);
-	
-		return glm::vec3(x, point.y, z);
 	}
 
 	void render(BVH& bvh, bool useBVH) {
@@ -114,11 +89,9 @@ public:
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
 				stepCounter.setHeightWidth(j, i);
 
-				glm::vec3 pixelWorldPos = topLeft +
-					(bottomLeft - topLeft) * ((float)j / HEIGHT) +
-					(topRight - topLeft) * ((float)i / WIDTH);
+				glm::vec3 pixelWorldPos = cam.getPixelWorldPos(j, i);
 
-				r.O = camera;
+				r.O = cam.getCam();
 				r.D = glm::normalize(pixelWorldPos - r.O);
 				r.t = 1e30f;
 
