@@ -170,15 +170,6 @@ private:
 	}
 
 	float evaulateCost(BVHNode& curr, int axis, float pos) {
-		if (type == SAH)
-			return evaulateSAH(curr, axis, pos);
-		if (type == RDH)
-			return evaulateRDH(curr, axis, pos);
-
-		return 1e30f;
-	}
-
-	float evaulateSAH(BVHNode& curr, int axis, float pos) {
 		AABB firstBox, secondBox;
 		int firstCount = 0;
 		int secondCount = 0;
@@ -201,34 +192,17 @@ private:
 			}
 		}
 
-		float cost = firstCount * firstBox.area() + secondCount * secondBox.area();
+		float cost = 0;
+
+		if (type == SAH)
+			cost = firstCount * firstBox.area() + secondCount * secondBox.area();
+		if (type == RDH) {
+			;
+		}
+
 		if (cost > 0)
 			return cost;
 
-		return 1e30f;
-	}
-
-	float evaulateRDH(BVHNode& curr, int axis, float pos) {
-		AABB firstBox, secondBox;
-
-		for (unsigned int i = 0; i < curr.primCount; i++) {
-			triangle& tri = prims[curr.leftFirst + i];
-
-			if (tri.centroid[axis] < pos) {
-				firstBox.grow(tri.p0);
-				firstBox.grow(tri.p1);
-				firstBox.grow(tri.p2);
-			}
-			else
-			{
-				secondBox.grow(tri.p0);
-				secondBox.grow(tri.p1);
-				secondBox.grow(tri.p2);
-			}
-		}
-
-		// Cast Ray Distribution rays to evaulate first and second box
-		
 		return 1e30f;
 	}
 
