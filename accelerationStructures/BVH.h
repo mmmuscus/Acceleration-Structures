@@ -24,6 +24,8 @@ private:
 	std::vector<ray> rayDistribution;
 
 public:
+	BVH() {}
+
 	BVH(BVHType _type) : type(_type), nodesUsed(1) {
 		for (int i = 0; i < TRIANGLE_COUNT * 2 - 1; i++) {
 			BVHNode newNode;
@@ -101,6 +103,31 @@ public:
 			traverse(r, curr.leftFirst);
 			traverse(r, curr.leftFirst + 1);
 		}
+	}
+
+	void serialize(const std::string& filename) {
+		std::ofstream file(filename, std::ios::binary);
+		if (!file.is_open()) {
+			std::cout << "FAILED TO OPEN FILE" << std::endl;
+			return;
+		}
+		file.write(reinterpret_cast<const char*>(this),
+			sizeof(*this));
+		file.close();
+	}
+
+	static BVH deserialize(const std::string& filename)
+	{
+		BVH obj = BVH();
+		std::ifstream file(filename, std::ios::binary);
+		if (!file.is_open()) {
+			std::cout << "FAILED TO OPEN FILE" << std::endl;
+			return obj;
+		}
+		file.read(reinterpret_cast<char*>(&obj),
+			sizeof(obj));
+		file.close();
+		return obj;
 	}
 
 private:

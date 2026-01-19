@@ -2,6 +2,8 @@
 #define GENERAL_H_
 
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <glad/glad.h>
 
 // Start of project based off of: https://github.com/ocornut/imgui/tree/docking/examples/example_glfw_opengl3

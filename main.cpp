@@ -75,15 +75,6 @@ int main()
     }
 
     printMCSV();
-    
-    // Normal render
-    // intersection tests per pixel: number of triangles
-    /*
-    sc.render(bvh, false);
-    glfwW.resizeGLFW();
-    openGlW.render();
-    glfwW.swapBuffers();
-    */
 
     // Main loop
     while (!glfwWindowShouldClose(glfwW.getWindow()))
