@@ -16,8 +16,8 @@ struct AABB {
 		bMin.z = fminf(bMin.z, p.z);
 
 		bMax.x = fmaxf(bMax.x, p.x);
-		bMax.y = fmaxf(bMax.x, p.y);
-		bMax.z = fmaxf(bMax.x, p.z);
+		bMax.y = fmaxf(bMax.y, p.y);
+		bMax.z = fmaxf(bMax.z, p.z);
 	}
 
 	float area() {
