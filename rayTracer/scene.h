@@ -60,9 +60,9 @@ public:
 					attrib.vertices[3 * indices[3 * face_ind + 2].vertex_index + 2]
 				);
 				// Shift model down and flip it
-				prim.p0.y = 1.5f - prim.p0.y + 2.0f;
-				prim.p1.y = 1.5f - prim.p1.y + 2.0f;
-				prim.p2.y = 1.5f - prim.p2.y + 2.0f;
+				prim.p0.y = 1.7f - prim.p0.y;
+				prim.p1.y = 1.7f - prim.p1.y;
+				prim.p2.y = 1.7f - prim.p2.y;
 				prim.calculateCentroid();
 
 				prims.push_back(prim);

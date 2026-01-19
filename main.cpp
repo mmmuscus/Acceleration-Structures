@@ -47,7 +47,10 @@ int main()
     //SAHBvh.buildBVH(sc.getCam());
 
     BVH RDHBvh = BVH(RDH);
-    RDHBvh.buildBVH(sc.getCam(), 3, 8);
+    //RDHBvh.buildBVH(sc.getCam(), 3, 8);
+
+    BVH RDHSAHBlendBvh = BVH(RDHSAHBlend);
+    //RDHSAHBlendBvh.buildBVH(sc.getCam(), 3, 8);
 
     // BVH render static
     /*
@@ -65,7 +68,7 @@ int main()
     for (angle = 0; angle < ANGLES; angle++) {
         std::cout << "Rendering scene with " << angle << " degree rotation around the y axis." << std::endl;
         sc.getCam()->spin((float)angle * M_PI / 180.0f);
-        sc.render(RDHBvh, true);
+        sc.render(naiveBvh, true);
         glfwW.resizeGLFW();
         openGlW.render();
         glfwW.swapBuffers();

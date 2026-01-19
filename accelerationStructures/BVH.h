@@ -11,7 +11,8 @@
 enum BVHType {
 	NAIVE,
 	SAH,
-	RDH
+	RDH,
+	RDHSAHBlend
 };
 
 class BVH {
@@ -20,7 +21,6 @@ private:
 	unsigned int nodesUsed;
 
 	BVHType type;
-
 	std::vector<ray> rayDistribution;
 
 public:
@@ -38,7 +38,7 @@ public:
 		root.updateBounds();
 
 		// Create ray distributions for BVH involving RDH
-		if (type == RDH)
+		if (type == RDH || type == RDHSAHBlend)
 			createRayDistribution(cam, numberOfViewpoints, patternSize);
 
 		subdivide(0);
@@ -49,6 +49,8 @@ public:
 			std::cout << "SAH BVH successfully built" << std::endl;
 		if (type == RDH)
 			std::cout << "RDH BVH successfully built" << std::endl;
+		if (type == RDHSAHBlend)
+			std::cout << "RDH blended with SAH BVH successfully built" << std::endl;
 	}
 
 	// Assumes that camera will always look at the origin
@@ -199,6 +201,7 @@ private:
 			for (unsigned int i = 0; i < curr.primCount; i++) {
 				triangle& tri = prims[curr.leftFirst + i];
 				float candidatePos = tri.centroid[axis];
+				std::cout << "Evaulating candidate: " << i << " / " << curr.primCount << " for axis: " << axis << std::endl;
 				float cost = evaulateCost(curr, axis, candidatePos);
 				if (cost < bestCost) {
 					bestPos = candidatePos;
@@ -240,6 +243,7 @@ private:
 
 		if (type == SAH)
 			cost = firstCount * firstBox.area() + secondCount * secondBox.area();
+		
 		if (type == RDH) {
 			int firstRayIntersectionCount = 0;
 			int secondRayIntersectionCount = 0;
@@ -256,6 +260,37 @@ private:
 				secondCount * secondRayIntersectionCount;
 		}
 
+		if (type == RDHSAHBlend) {
+			int firstRayIntersectionCount = 0;
+			int secondRayIntersectionCount = 0;
+
+			for (int i = 0; i < rayDistribution.size(); i++) {
+				if (firstBox.intersect(rayDistribution[i]))
+					firstRayIntersectionCount++;
+
+				if (secondBox.intersect(rayDistribution[i]))
+					secondRayIntersectionCount++;
+			}
+
+			// Calculate SAH and RDH costs
+			float RDHCost = firstCount * firstRayIntersectionCount +
+				secondCount * secondRayIntersectionCount;
+			float SAHCost = firstCount * firstBox.area() + secondCount * secondBox.area();
+
+			// Calculate blend weight
+			int R = 0; // Number of rays intersecting parent
+			for (int i = 0; i < rayDistribution.size(); i++)
+				if (curr.intersectAABB(rayDistribution[i]))
+					R++;
+
+			float alpha = 0.9f;
+			float beta = 0.1f;
+			float w = alpha * (1.0f - (1.0f / (1.0f + beta * (float)R)));
+
+			// Final cost			
+			cost = w * RDHCost + (1.0f - w) * SAHCost;
+		}
+
 		if (cost > 0)
 			return cost;
 
@@ -265,15 +300,35 @@ private:
 	float evaulateParentCost(BVHNode& curr) {
 		if (type == SAH)
 			return curr.primCount * curr.aabb.area();
+
 		if (type == RDH) {
 			float cost = 0;
 
-			for (int i = 0; i < rayDistribution.size(); i++) {
+			for (int i = 0; i < rayDistribution.size(); i++)
 				if (curr.intersectAABB(rayDistribution[i]))
 					cost += curr.primCount;
-			}
 
 			return cost;
+		}
+
+		if (type == RDHSAHBlend) {
+			int R = 0;  // Number of rays intersecting parent
+
+			for (int i = 0; i < rayDistribution.size(); i++)
+				if (curr.intersectAABB(rayDistribution[i]))
+					R++;
+
+			// Calculate SAH and RDH costs
+			float RDHCost = (float)R * curr.primCount;
+			float SAHCost = curr.primCount * curr.aabb.area();
+
+			// Calculate blend weight
+			float alpha = 0.9f;
+			float beta = 0.1f;
+			float w = alpha * (1.0f - (1.0f / (1.0f + beta * (float)R)));
+
+			// Final cost
+			return w * RDHCost + (1.0f - w) * SAHCost;
 		}
 
 		return 0;
