@@ -3,6 +3,8 @@
 
 #include "../general/general.h"
 
+#include "../rayTracer/camera.h"
+
 #include "BVHNode.h"
 #include "instrumentation.h"
 
@@ -19,6 +21,8 @@ private:
 
 	BVHType type;
 
+	std::vector<ray> rayDistribution;
+
 public:
 	BVH(BVHType _type) : type(_type), nodesUsed(1) {
 		for (int i = 0; i < TRIANGLE_COUNT * 2 - 1; i++) {
@@ -27,11 +31,15 @@ public:
 		}
 	}
 
-	void buildBVH() {
+	void buildBVH(camera* cam = NULL, int numberOfViewpoints = 20, int patternSize = 4) {
 		BVHNode& root = nodes[0];
 		root.leftFirst = 0;
 		root.primCount = TRIANGLE_COUNT;
 		root.updateBounds();
+
+		// Create ray distributions for BVH involving RDH
+		if (type == RDH)
+			createRayDistribution(cam, numberOfViewpoints, patternSize);
 
 		subdivide(0);
 
@@ -41,6 +49,37 @@ public:
 			std::cout << "SAH BVH successfully built" << std::endl;
 		if (type == RDH)
 			std::cout << "RDH BVH successfully built" << std::endl;
+	}
+
+	// Assumes that camera will always look at the origin
+	void createRayDistribution(camera* cam, int numberOfViewpoints, int patternSize) {
+		float angleStep = 2.0f * M_PI / (float)numberOfViewpoints; // 360.0f / numberOfViewpoints * M_PI / 180.0f;
+
+		std::cout << "START OF RAYDISTRIBUTION BUILDING" << std::endl;
+
+		for (int i = 0; i < numberOfViewpoints; i++) {
+			cam->spin(i * angleStep);
+
+			std::cout << "Calculating rays for viewpoint number: " << i << std::endl;
+
+			for (int j = 0; j < HEIGHT; j += patternSize) { // ROWS
+				for (int i = 0; i < WIDTH; i += patternSize) { // COLUMNS
+					glm::vec3 pixelWorldPos = cam->getPixelWorldPos(j, i);
+
+					ray newRay;
+					newRay.O = cam->getCam();
+					newRay.D = glm::normalize(pixelWorldPos - newRay.O);
+					newRay.t = 1e30f;
+
+					rayDistribution.push_back(newRay);
+				}
+			}
+		}
+
+		// Reset camera
+		cam->spin(0.0f);
+
+		std::cout << "END OF RAYDISTRIBUTION BUILDING" << std::endl;
 	}
 
 	void traverse(ray& r, unsigned int nodeIdx) {
@@ -75,6 +114,8 @@ private:
 		BVHNode& curr = nodes[nodeIdx];
 
 		// Splitting
+		std::cout << "Splitting node: " << nodeIdx << std::endl;
+
 		if (type == NAIVE)
 			splitNaive(nodeIdx, splitAxis, splitPosition);
 		else {
@@ -83,6 +124,9 @@ private:
 
 			splitCost = splitWithCost(nodeIdx, splitAxis, splitPosition);
 			parentCost = evaulateParentCost(curr);
+
+			if (splitCost > parentCost)
+				return;
 		}
 
 		// Swap triangles around
@@ -197,7 +241,19 @@ private:
 		if (type == SAH)
 			cost = firstCount * firstBox.area() + secondCount * secondBox.area();
 		if (type == RDH) {
-			;
+			int firstRayIntersectionCount = 0;
+			int secondRayIntersectionCount = 0;
+
+			for (int i = 0; i < rayDistribution.size(); i++) {
+				if (firstBox.intersect(rayDistribution[i]))
+					firstRayIntersectionCount++;
+
+				if (secondBox.intersect(rayDistribution[i]))
+					secondRayIntersectionCount++;
+			}
+
+			cost = firstCount * firstRayIntersectionCount +
+				secondCount * secondRayIntersectionCount;
 		}
 
 		if (cost > 0)
@@ -210,7 +266,14 @@ private:
 		if (type == SAH)
 			return curr.primCount * curr.aabb.area();
 		if (type == RDH) {
-			return 0; // TODO
+			float cost = 0;
+
+			for (int i = 0; i < rayDistribution.size(); i++) {
+				if (curr.intersectAABB(rayDistribution[i]))
+					cost += curr.primCount;
+			}
+
+			return cost;
 		}
 
 		return 0;

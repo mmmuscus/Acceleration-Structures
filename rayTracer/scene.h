@@ -10,14 +10,14 @@
 
 class scene {
 private:
-	camera cam;
+	camera* cam;
 
 public:
-	scene(glm::vec3 _c) : cam(camera(_c)) {}
-
-	void spinCamera(float rad) {
-		cam.spin(rad);
+	scene(glm::vec3 _c) {
+		cam = new camera(_c);
 	}
+
+	camera* getCam() { return cam; }
 
 	// Guided by: https://vulkan-tutorial.com/Loading_models
 	// Also by: https://github.com/canmom/rasteriser/blob/master/fileloader.cpp
@@ -89,9 +89,9 @@ public:
 			for (int i = 0; i < WIDTH; i++) { // COLUMNS
 				stepCounter.setHeightWidth(j, i);
 
-				glm::vec3 pixelWorldPos = cam.getPixelWorldPos(j, i);
+				glm::vec3 pixelWorldPos = cam->getPixelWorldPos(j, i);
 
-				r.O = cam.getCam();
+				r.O = cam->getCam();
 				r.D = glm::normalize(pixelWorldPos - r.O);
 				r.t = 1e30f;
 

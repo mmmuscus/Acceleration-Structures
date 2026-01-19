@@ -24,6 +24,25 @@ struct AABB {
 		glm::vec3 extent = bMax - bMin;
 		return extent.x * extent.y + extent.y * extent.z + extent.z * extent.x;
 	}
+
+	bool intersect(const ray& r) {
+		float tx1 = (bMin.x - r.O.x) / r.D.x;
+		float tx2 = (bMax.x - r.O.x) / r.D.x;
+		float tMin = fminf(tx1, tx2);
+		float tMax = fmaxf(tx1, tx2);
+
+		float ty1 = (bMin.y - r.O.y) / r.D.y;
+		float ty2 = (bMax.y - r.O.y) / r.D.y;
+		tMin = fmaxf(tMin, fminf(ty1, ty2));
+		tMax = fminf(tMax, fmaxf(ty1, ty2));
+
+		float tz1 = (bMin.z - r.O.z) / r.D.z;
+		float tz2 = (bMax.z - r.O.z) / r.D.z;
+		tMin = fmaxf(tMin, fminf(tz1, tz2));
+		tMax = fminf(tMax, fmaxf(tz1, tz2));
+
+		return (tMax >= tMin) && (tMin < r.t) && (tMax > 0.0f);
+	}
 };
 
 class BVHNode {
@@ -58,22 +77,7 @@ public:
 
 	// Lifted from: https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 	bool intersectAABB(const ray& r) {
-		float tx1 = (aabb.bMin.x - r.O.x) / r.D.x;
-		float tx2 = (aabb.bMax.x - r.O.x) / r.D.x;
-		float tMin = fminf(tx1, tx2);
-		float tMax = fmaxf(tx1, tx2);
-
-		float ty1 = (aabb.bMin.y - r.O.y) / r.D.y;
-		float ty2 = (aabb.bMax.y - r.O.y) / r.D.y;
-		tMin = fmaxf(tMin, fminf(ty1, ty2));
-		tMax = fminf(tMax, fmaxf(ty1, ty2));
-
-		float tz1 = (aabb.bMin.z - r.O.z) / r.D.z;
-		float tz2 = (aabb.bMax.z - r.O.z) / r.D.z;
-		tMin = fmaxf(tMin, fminf(tz1, tz2));
-		tMax = fminf(tMax, fmaxf(tz1, tz2));
-
-		return (tMax >= tMin) && (tMin < r.t) && (tMax > 0.0f);
+		return aabb.intersect(r);
 	}
 };
 
