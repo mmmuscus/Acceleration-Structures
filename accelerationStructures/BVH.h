@@ -70,25 +70,19 @@ private:
 
 		unsigned int splitAxis;
 		float splitPosition;
+		float splitCost, parentCost;
 
 		BVHNode& curr = nodes[nodeIdx];
 
 		// Splitting
 		if (type == NAIVE)
 			splitNaive(nodeIdx, splitAxis, splitPosition);
-		if (type == SAH) {
+		else {
 			if (nodes[nodeIdx].primCount <= 1)
 				return;
 
-			float splitCost = splitSAH(nodeIdx, splitAxis, splitPosition);
-			float parentCost = curr.primCount * curr.aabb.area();
-
-			// Terminate recursion SAH
-			if (splitCost >= parentCost)
-				return;
-		}
-		if (type == RDH) {
-
+			splitCost = splitWithCost(nodeIdx, splitAxis, splitPosition);
+			parentCost = evaulateParentCost(curr);
 		}
 
 		// Swap triangles around
@@ -151,7 +145,7 @@ private:
 		}
 	}
 
-	float splitSAH(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
+	float splitWithCost(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
 		BVHNode& curr = nodes[idx];
 		int bestAxis = -1;
 		float bestPos = 0;
@@ -161,7 +155,7 @@ private:
 			for (unsigned int i = 0; i < curr.primCount; i++) {
 				triangle& tri = prims[curr.leftFirst + i];
 				float candidatePos = tri.centroid[axis];
-				float cost = evaulateSAH(curr, axis, candidatePos);
+				float cost = evaulateCost(curr, axis, candidatePos);
 				if (cost < bestCost) {
 					bestPos = candidatePos;
 					bestAxis = axis;
@@ -173,6 +167,15 @@ private:
 		splitAxis = bestAxis;
 		splitPosition = bestPos;
 		return bestCost;
+	}
+
+	float evaulateCost(BVHNode& curr, int axis, float pos) {
+		if (type == SAH)
+			return evaulateSAH(curr, axis, pos);
+		if (type == RDH)
+			return evaulateRDH(curr, axis, pos);
+
+		return 1e30f;
 	}
 
 	float evaulateSAH(BVHNode& curr, int axis, float pos) {
@@ -205,47 +208,19 @@ private:
 		return 1e30f;
 	}
 
-	float splitRDH(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
-		BVHNode& curr = nodes[idx];
-		int bestAxis = -1;
-		float bestPos = 0;
-		float bestCost = 1e30f;
-
-		for (unsigned int axis = 0; axis < 3; axis++) {
-			for (unsigned int i = 0; i < curr.primCount; i++) {
-				triangle& tri = prims[curr.leftFirst + i];
-				float candidatePos = tri.centroid[axis];
-				float cost = evaulateRDH(curr, axis, candidatePos);
-				if (cost < bestCost) {
-					bestPos = candidatePos;
-					bestAxis = axis;
-					bestCost = cost;
-				}
-			}
-		}
-
-		splitAxis = bestAxis;
-		splitPosition = bestPos;
-		return bestCost;
-	}
-
 	float evaulateRDH(BVHNode& curr, int axis, float pos) {
 		AABB firstBox, secondBox;
-		int firstCount = 0;
-		int secondCount = 0;
 
 		for (unsigned int i = 0; i < curr.primCount; i++) {
 			triangle& tri = prims[curr.leftFirst + i];
 
 			if (tri.centroid[axis] < pos) {
-				firstCount++;
 				firstBox.grow(tri.p0);
 				firstBox.grow(tri.p1);
 				firstBox.grow(tri.p2);
 			}
 			else
 			{
-				secondCount++;
 				secondBox.grow(tri.p0);
 				secondBox.grow(tri.p1);
 				secondBox.grow(tri.p2);
@@ -255,6 +230,16 @@ private:
 		// Cast Ray Distribution rays to evaulate first and second box
 		
 		return 1e30f;
+	}
+
+	float evaulateParentCost(BVHNode& curr) {
+		if (type == SAH)
+			return curr.primCount * curr.aabb.area();
+		if (type == RDH) {
+			return 0; // TODO
+		}
+
+		return 0;
 	}
 };
 
