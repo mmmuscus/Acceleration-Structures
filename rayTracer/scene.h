@@ -74,13 +74,13 @@ public:
 				prims.push_back(prim);
 
 				// Triangle for second teapot
-				//triangle prim2 = prim;
-				//prim2.p0 += glm::vec3(0.0f, -4.0f, 0.0f);
-				//prim2.p1 += glm::vec3(0.0f, -4.0f, 0.0f);
-				//prim2.p2 += glm::vec3(0.0f, -4.0f, 0.0f);
-				//prim2.calculateCentroid();
+				triangle prim2 = prim;
+				prim2.p0 += glm::vec3(0.0f, -4.0f, 0.0f);
+				prim2.p1 += glm::vec3(0.0f, -4.0f, 0.0f);
+				prim2.p2 += glm::vec3(0.0f, -4.0f, 0.0f);
+				prim2.calculateCentroid();
 
-				//prims.push_back(prim2);
+				prims.push_back(prim2);
 			}
 		}
 
