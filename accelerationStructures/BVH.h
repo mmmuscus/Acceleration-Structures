@@ -30,10 +30,15 @@ private:
 	std::vector<ray> rayDistribution;
 	std::vector<unsigned int> visibilityMeasures;
 
-public:
-	BVH() {}
+	// Measurements for building BVH
+	unsigned int costEvals;
+	unsigned int AABBIntersectionCount;
+	unsigned int primIntersectionCount;
 
-	BVH(BVHType _type) : type(_type), nodesUsed(1) {
+public:
+	BVH(BVHType _type) : type(_type), nodesUsed(1),
+		costEvals(0), AABBIntersectionCount(0), primIntersectionCount(0)
+	{
 		for (int i = 0; i < TRIANGLE_COUNT * 2 - 1; i++) {
 			BVHNode newNode;
 			nodes.push_back(newNode);
@@ -48,11 +53,30 @@ public:
 			
 	}
 
+	void buildAndSerialize(
+		const std::string& filename,
+		camera* cam = NULL, int numberOfViewpoints = 20, int patternSize = 4
+	) {
+ 		buildBVH(cam, numberOfViewpoints, patternSize);
+		serialize(filename);
+	}
+
 	void buildBVH(camera* cam = NULL, int numberOfViewpoints = 20, int patternSize = 4) {
 		BVHNode& root = nodes[0];
 		root.leftFirst = 0;
 		root.primCount = TRIANGLE_COUNT;
 		updateBounds(root);
+
+		if (type == NAIVE)
+			std::cout << "Building naive BVH started" << std::endl;
+		if (type == SAH)
+			std::cout << "Building SAH BVH started" << std::endl;
+		if (type == RDH)
+			std::cout << "Building RDH BVH started" << std::endl;
+		if (type == RDHSAHBLEND)
+			std::cout << "Building RDH blended with SAH BVH started" << std::endl;
+		if (type == OH)
+			std::cout << "Building OH BVH started" << std::endl;
 
 		// Create ray distributions for BVH involving RDH
 		if (type == RDH || type == RDHSAHBLEND)
@@ -60,6 +84,8 @@ public:
 
 		if (type == OH)
 			createVisibilityMeasures(cam, numberOfViewpoints);
+
+		std::cout << "Subdivision started" << std::endl;
 
 		subdivide(0, 1);
 
@@ -149,8 +175,6 @@ private:
 		for (int step = 0; step < numberOfViewpoints; step++) {
 			cam->spin(step * angleStep);
 
-			std::cout << "Calculating rays for viewpoint number: " << step << std::endl;
-
 			for (int j = 0; j < HEIGHT; j += patternSize) { // ROWS
 				for (int i = 0; i < WIDTH; i += patternSize) { // COLUMNS
 					glm::vec3 pixelWorldPos = cam->getPixelWorldPos(j, i);
@@ -177,8 +201,6 @@ private:
 			cam->spin(step * angleStep);
 			r.O = cam->getCam();
 
-			std::cout << "Calculating occlusion metrics for viewpoint number: " << step << std::endl;
-
 			std::vector<unsigned int> tempVisMeas;
 			for (int i = 0; i < TRIANGLE_COUNT; i++)
 				tempVisMeas.push_back(0);
@@ -192,15 +214,12 @@ private:
 
 					unsigned int lastPrimIdx = TRIANGLE_COUNT;
 
-					std::cout << "Casting ray: ( " << i << " , " << j << " )\n";
-
 					for (int n = 0; n < TRIANGLE_COUNT; n++) {
 						float lastIntersection = r.t;
 						// Indirection not needed, array is still in initial order
 						prims[primIdx[n]].rayIntersection(r);
 
 						if (r.t < lastIntersection) {
-							std::cout << "New triangle found!" << std::endl;
 							if (lastPrimIdx != TRIANGLE_COUNT)
 								tempVisMeas[lastPrimIdx]--;
 
@@ -232,8 +251,6 @@ private:
 		BVHNode& curr = nodes[nodeIdx];
 
 		// Splitting
-		std::cout << "Splitting node: " << nodeIdx << std::endl;
-
 		if (type == NAIVE)
 			splitNaive(nodeIdx, splitAxis, splitPosition);
 		else {
@@ -319,7 +336,6 @@ private:
 			for (unsigned int i = 0; i < curr.primCount; i++) {
 				triangle& tri = prims[primIdx[curr.leftFirst + i]];
 				float candidatePos = tri.centroid[axis];
-				std::cout << "Evaulating candidate: " << i << " / " << curr.primCount << " for axis: " << axis << std::endl;
 				float cost = evaulateCost(curr, depth, axis, candidatePos);
 				if (cost < bestCost) {
 					bestPos = candidatePos;

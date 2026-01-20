@@ -39,23 +39,26 @@ int main()
     sc.initScene();
     std::cout << "Scene successfully populated" << std::endl;
 
-    // Build BVHs
+    // List of BVHs
     BVH naiveBvh = BVH(NAIVE);
-    //naiveBvh.buildBVH();
-    //naiveBvh.serialize("BVHs/naive.txt");
-    naiveBvh.deserialize("BVHs/naive.txt");
-
     BVH SAHBvh = BVH(SAH);
-    //SAHBvh.buildBVH(sc.getCam());
-
     BVH RDHBvh = BVH(RDH);
-    //RDHBvh.buildBVH(sc.getCam(), 3, 8);
-
     BVH RDHSAHBlendBvh = BVH(RDHSAHBLEND);
-    //RDHSAHBlendBvh.buildBVH(sc.getCam(), 3, 8);
-    
     BVH OHBvh = BVH(OH);
-    //OHBvh.buildBVH(sc.getCam(), 2);
+
+    // Build and serialize BVHs
+    //naiveBvh.buildAndSerialize("BVHs/naive.txt");
+    //SAHBvh.buildAndSerialize("BVHs/SAH.txt");
+    //RDHBvh.buildAndSerialize("BVHs/RDH-3-8.txt", sc.getCam(), 3, 8);
+    //RDHSAHBlendBvh.buildAndSerialize("BVHs/RDHSAHBlended-3-8.txt", sc.getCam(), 3, 8);
+    //OHBvh.buildAndSerialize("BVHs/OH-3.txt", sc.getCam(), 3);
+
+    // Deserialiaze BVHs
+    //naiveBvh.deserialize("BVHs/naive.txt");
+    SAHBvh.deserialize("BVHs/SAH.txt");
+    //RDHBvh.deserialize("BVHs/RDH-3-8.txt");
+    //RDHSAHBlendBvh.deserialize("BVHs/RDHSAHBlended-3-8.txt");
+    //OHBvh.deserialize("BVHs/OH-3");
 
     // BVH render static
     /*
@@ -68,12 +71,14 @@ int main()
     glfwW.swapBuffers();
     */
 
+    BVH& renderBvh = SAHBvh;
+
     // BVH render spinning
     openGlW.setTextureIndex(3);
     for (angle = 0; angle < ANGLES; angle++) {
         std::cout << "Rendering scene with " << angle << " degree rotation around the y axis." << std::endl;
         sc.getCam()->spin((float)angle * M_PI / 180.0f);
-        sc.render(naiveBvh);
+        sc.render(renderBvh);
         glfwW.resizeGLFW();
         openGlW.render();
         glfwW.swapBuffers();
