@@ -141,6 +141,10 @@ public:
 			file.write(reinterpret_cast<const char*>(&primIdx[i]), sizeof(primIdx[i]));
 		}
 
+		file.write(reinterpret_cast<const char*>(&costEvals), sizeof(costEvals));
+		file.write(reinterpret_cast<const char*>(&AABBIntersectionCount), sizeof(AABBIntersectionCount));
+		file.write(reinterpret_cast<const char*>(&primIntersectionCount), sizeof(primIntersectionCount));
+
 		file.close();
 	}
 
@@ -164,6 +168,10 @@ public:
 		for (unsigned int i = 0; i < primIdxSize; i++) {
 			file.read(reinterpret_cast<char*>(&primIdx[i]), sizeof(primIdx[i]));
 		}
+
+		file.read(reinterpret_cast<char*>(&costEvals), sizeof(costEvals));
+		file.read(reinterpret_cast<char*>(&AABBIntersectionCount), sizeof(AABBIntersectionCount));
+		file.read(reinterpret_cast<char*>(&primIntersectionCount), sizeof(primIntersectionCount));
 
 		file.close();
 	}
