@@ -49,7 +49,7 @@ public:
 		BVHNode& root = nodes[0];
 		root.leftFirst = 0;
 		root.primCount = TRIANGLE_COUNT;
-		root.updateBounds();
+		updateBounds(root);
 
 		// Create ray distributions for BVH involving RDH
 		if (type == RDH || type == RDHSAHBLEND)
@@ -72,6 +72,64 @@ public:
 			std::cout << "OH BVH successfully built" << std::endl;
 	}
 
+	void traverse(ray& r, unsigned int nodeIdx) {
+		stepCounter.increaseTraversal();
+
+		BVHNode& curr = nodes[nodeIdx];
+
+		if (!curr.intersectAABB(r))
+			return;
+
+		if (curr.primCount != 0) {
+			for (int i = 0; i < curr.primCount; i++) {
+				prims[primIdx[curr.leftFirst + i]].rayIntersection(r);
+			}
+		}
+		else {
+			traverse(r, curr.leftFirst);
+			traverse(r, curr.leftFirst + 1);
+		}
+	}
+
+	void serialize(const std::string& filename) {
+		std::ofstream file(filename, std::ios::binary);
+		if (!file.is_open()) {
+			std::cout << "FAILED TO OPEN FILE" << std::endl;
+			return;
+		}
+
+		file.write(reinterpret_cast<const char*>(&type), sizeof(type));
+		file.write(reinterpret_cast<const char*>(&nodesUsed), sizeof(nodesUsed));
+
+		for (unsigned int i = 0; i < nodesUsed; i++) {
+			file.write(reinterpret_cast<const char*>(&nodes[i]), sizeof(nodes[i]));
+		}
+
+		file.close();
+	}
+
+	void deserialize(const std::string& filename)
+	{
+		std::ifstream file(filename, std::ios::binary);
+		if (!file.is_open()) {
+			std::cout << "FAILED TO OPEN FILE" << std::endl;
+			return;
+		}
+
+		file.read(reinterpret_cast<char*>(&type), sizeof(type));
+		file.read(reinterpret_cast<char*>(&nodesUsed), sizeof(nodesUsed));
+
+		for (unsigned int i = 0; i < nodesUsed; i++) {
+			BVHNode newNode;
+			file.read(reinterpret_cast<char*>(&newNode), sizeof(newNode));
+
+			nodes[i] = newNode;
+		}
+
+		file.close();
+	}
+
+private:
 	// Assumes that camera will always look at the origin
 	void createRayDistribution(camera* cam, int numberOfViewpoints, int patternSize) {
 		float angleStep = 2.0f * M_PI / (float)numberOfViewpoints; // 360.0f / numberOfViewpoints * M_PI / 180.0f;
@@ -142,64 +200,6 @@ public:
 		cam->spin(0.0f);
 	}
 
-	void traverse(ray& r, unsigned int nodeIdx) {
-		stepCounter.increaseTraversal();
-
-		BVHNode& curr = nodes[nodeIdx];
-
-		if (!curr.intersectAABB(r))
-			return;
-
-		if (curr.primCount != 0) {
-			for (int i = 0; i < curr.primCount; i++) {
-				prims[curr.leftFirst + i].rayIntersection(r);
-			}
-		}
-		else {
-			traverse(r, curr.leftFirst);
-			traverse(r, curr.leftFirst + 1);
-		}
-	}
-
-	void serialize(const std::string& filename) {
-		std::ofstream file(filename, std::ios::binary);
-		if (!file.is_open()) {
-			std::cout << "FAILED TO OPEN FILE" << std::endl;
-			return;
-		}
-
-		file.write(reinterpret_cast<const char*>(&type), sizeof(type));
-		file.write(reinterpret_cast<const char*>(&nodesUsed), sizeof(nodesUsed));
-
-		for (unsigned int i = 0; i < nodesUsed; i++) {
-			file.write(reinterpret_cast<const char*>(&nodes[i]), sizeof(nodes[i]));
-		}
-
-		file.close();
-	}
-
-	void deserialize(const std::string& filename)
-	{
-		std::ifstream file(filename, std::ios::binary);
-		if (!file.is_open()) {
-			std::cout << "FAILED TO OPEN FILE" << std::endl;
-			return;
-		}
-
-		file.read(reinterpret_cast<char*>(&type), sizeof(type));
-		file.read(reinterpret_cast<char*>(&nodesUsed), sizeof(nodesUsed));
-
-		for (unsigned int i = 0; i < nodesUsed; i++) {
-			BVHNode newNode;
-			file.read(reinterpret_cast<char*>(&newNode), sizeof(newNode));
-
-			nodes[i] = newNode;
-		}
-
-		file.close();
-	}
-
-private:
 	void subdivide(unsigned int nodeIdx, unsigned int depth) {
 		// Terminate recursion NAIVE
 		if (type == NAIVE && nodes[nodeIdx].primCount <= 3)
@@ -231,14 +231,14 @@ private:
 		unsigned int start = curr.leftFirst;
 		unsigned int end = start + curr.primCount;
 		while (start < end) {
-			if (prims[start].centroid[splitAxis] < splitPosition) {
+			if (prims[primIdx[start]].centroid[splitAxis] < splitPosition) {
 				start++;
 			}
 			else {
 				// Ugly swap primitive
-				triangle temp = prims[end - 1];
-				prims[end - 1] = prims[start];
-				prims[start] = temp;
+				unsigned int temp = primIdx[end - 1];
+				primIdx[end - 1] = primIdx[start];
+				primIdx[start] = temp;
 
 				if (type == OH) {
 					// Ugly swap visibility measures
@@ -262,12 +262,12 @@ private:
 		BVHNode& left = nodes[leftIdx];
 		left.leftFirst = curr.leftFirst;
 		left.primCount = leftCount;
-		left.updateBounds();
+		updateBounds(left);
 		curr.leftFirst = leftIdx;
 		BVHNode& right = nodes[rightIdx];
 		right.leftFirst = left.leftFirst + left.primCount;
 		right.primCount = curr.primCount - left.primCount;
-		right.updateBounds();
+		updateBounds(right);
 		curr.primCount = 0;
 
 		// Recurse
@@ -478,6 +478,29 @@ private:
 		}
 
 		return 0;
+	}
+
+	void updateBounds(BVHNode& curr) {
+		if (curr.primCount == 0)
+			return;
+
+		glm::vec3 min = glm::vec3(1e30f, 1e30f, 1e30f);
+		glm::vec3 max = glm::vec3(-1e30f, -1e30f, -1e30f);
+
+		int end = curr.leftFirst + curr.primCount;
+		for (int i = curr.leftFirst; i < end; i++) {
+			glm::vec3 primMin = prims[primIdx[i]].min();
+			min.x = fminf(min.x, primMin.x);
+			min.y = fminf(min.y, primMin.y);
+			min.z = fminf(min.z, primMin.z);
+
+			glm::vec3 primMax = prims[primIdx[i]].max();
+			max.x = fmaxf(max.x, primMax.x);
+			max.y = fmaxf(max.y, primMax.y);
+			max.z = fmaxf(max.z, primMax.z);
+		}
+
+		curr.updateBounds(min, max);
 	}
 };
 

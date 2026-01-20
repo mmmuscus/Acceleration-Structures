@@ -81,7 +81,7 @@ public:
 		TRIANGLE_COUNT = prims.size();
 	}
 
-	void render(BVH& bvh, bool useBVH) {
+	void render(BVH& bvh) {
 		stepCounter.reset();
 		ray r;
 
@@ -95,13 +95,7 @@ public:
 				r.D = glm::normalize(pixelWorldPos - r.O);
 				r.t = 1e30f;
 
-				if (useBVH)
-					bvh.traverse(r, 0);
-				else
-				{
-					for (int n = 0; n < TRIANGLE_COUNT; n++)
-						prims[n].rayIntersection(r);
-				}
+				bvh.traverse(r, 0);
 
 				unsigned int offset = j * WIDTH + i;
 				if (r.t < 1e30f) {

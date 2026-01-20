@@ -56,23 +56,14 @@ public:
 		aabb.bMax = glm::vec3(-1e30f, -1e30f, -1e30f);
 	}
 
-	void updateBounds() {
-		if (primCount == 0)
-			return;
+	void updateBounds(glm::vec3 min, glm::vec3 max) {
+		aabb.bMin.x = fminf(aabb.bMin.x, min.x);
+		aabb.bMin.y = fminf(aabb.bMin.y, min.y);
+		aabb.bMin.z = fminf(aabb.bMin.z, min.z);
 
-		int end = leftFirst + primCount;
-		for (int i = leftFirst; i < end; i++) {
-			glm::vec3 triMin = prims[i].min();
-			
-			aabb.bMin.x = fminf(aabb.bMin.x, triMin.x);
-			aabb.bMin.y = fminf(aabb.bMin.y, triMin.y);
-			aabb.bMin.z = fminf(aabb.bMin.z, triMin.z);
-
-			glm::vec3 triMax = prims[i].max();
-			aabb.bMax.x = fmaxf(aabb.bMax.x, triMax.x);
-			aabb.bMax.y = fmaxf(aabb.bMax.y, triMax.y);
-			aabb.bMax.z = fmaxf(aabb.bMax.z, triMax.z);
-		}
+		aabb.bMax.x = fmaxf(aabb.bMax.x, max.x);
+		aabb.bMax.y = fmaxf(aabb.bMax.y, max.y);
+		aabb.bMax.z = fmaxf(aabb.bMax.z, max.z);
 	}
 
 	// Lifted from: https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
