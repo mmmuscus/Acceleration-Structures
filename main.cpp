@@ -42,7 +42,7 @@ int main()
     scGeos.createTestScene();
 
     // Init scene
-    sc.setSceneGeometry(scGeos.testScene);
+    sc.setSceneGeometry(scGeos.baseScene);
     std::cout << "Scene successfully populated" << std::endl;
 
     // List of BVHs

@@ -3,14 +3,14 @@
 
 #include "triangle.h"
 
-// Reading .obj files guided by: https://vulkan-tutorial.com/Loading_models
-// Also by: https://github.com/canmom/rasteriser/blob/master/fileloader.cpp
-
+// Very ugly solution for storing and loading multiple scenes
 class sceneGeometries {
 public:
 	std::vector<triangle> baseScene;
 	std::vector<triangle> testScene;
 
+	// Reading .obj files guided by: https://vulkan-tutorial.com/Loading_models
+	// Also by: https://github.com/canmom/rasteriser/blob/master/fileloader.cpp
 	void createBaseScene() {
 		std::cout << "Loading base scene started" << std::endl;
 		tinyobj::attrib_t attrib;
