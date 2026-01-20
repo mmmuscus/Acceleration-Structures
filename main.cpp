@@ -41,7 +41,9 @@ int main()
 
     // Build BVHs
     BVH naiveBvh = BVH(NAIVE);
-    naiveBvh.buildBVH();
+    //naiveBvh.buildBVH();
+    //naiveBvh.serialize("BVHs/naive.txt");
+    naiveBvh.deserialize("BVHs/naive.txt");
 
     BVH SAHBvh = BVH(SAH);
     //SAHBvh.buildBVH(sc.getCam());
@@ -49,7 +51,7 @@ int main()
     BVH RDHBvh = BVH(RDH);
     //RDHBvh.buildBVH(sc.getCam(), 3, 8);
 
-    BVH RDHSAHBlendBvh = BVH(RDHSAHBlend);
+    BVH RDHSAHBlendBvh = BVH(RDHSAHBLEND);
     //RDHSAHBlendBvh.buildBVH(sc.getCam(), 3, 8);
 
     // BVH render static

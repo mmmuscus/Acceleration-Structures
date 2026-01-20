@@ -12,15 +12,15 @@ enum BVHType {
 	NAIVE,
 	SAH,
 	RDH,
-	RDHSAHBlend
+	RDHSAHBLEND
 };
 
 class BVH {
 private:
-	std::vector<BVHNode> nodes;
+	BVHType type;
 	unsigned int nodesUsed;
 
-	BVHType type;
+	std::vector<BVHNode> nodes;
 	std::vector<ray> rayDistribution;
 
 public:
@@ -40,7 +40,7 @@ public:
 		root.updateBounds();
 
 		// Create ray distributions for BVH involving RDH
-		if (type == RDH || type == RDHSAHBlend)
+		if (type == RDH || type == RDHSAHBLEND)
 			createRayDistribution(cam, numberOfViewpoints, patternSize);
 
 		subdivide(0);
@@ -51,7 +51,7 @@ public:
 			std::cout << "SAH BVH successfully built" << std::endl;
 		if (type == RDH)
 			std::cout << "RDH BVH successfully built" << std::endl;
-		if (type == RDHSAHBlend)
+		if (type == RDHSAHBLEND)
 			std::cout << "RDH blended with SAH BVH successfully built" << std::endl;
 	}
 
@@ -111,12 +111,18 @@ public:
 			std::cout << "FAILED TO OPEN FILE" << std::endl;
 			return;
 		}
-		file.write(reinterpret_cast<const char*>(this),
-			sizeof(*this));
+
+		file.write(reinterpret_cast<const char*>(&type), sizeof(type));
+		file.write(reinterpret_cast<const char*>(&nodesUsed), sizeof(nodesUsed));
+
+		for (unsigned int i = 0; i < nodesUsed; i++) {
+			file.write(reinterpret_cast<const char*>(&nodes[i]), sizeof(nodes[i]));
+		}
+
 		file.close();
 	}
 
-	static BVH deserialize(const std::string& filename)
+	BVH deserialize(const std::string& filename)
 	{
 		BVH obj = BVH();
 		std::ifstream file(filename, std::ios::binary);
@@ -124,9 +130,18 @@ public:
 			std::cout << "FAILED TO OPEN FILE" << std::endl;
 			return obj;
 		}
-		file.read(reinterpret_cast<char*>(&obj),
-			sizeof(obj));
+
+		file.read(reinterpret_cast<char*>(&type), sizeof(type));
+		file.read(reinterpret_cast<char*>(&nodesUsed), sizeof(nodesUsed));
+
+		for (unsigned int i = 0; i < nodesUsed; i++) {
+			BVHNode newNode;
+			file.read(reinterpret_cast<char*>(&newNode), sizeof(newNode));
+			nodes[i] = newNode;
+		}
+
 		file.close();
+
 		return obj;
 	}
 
@@ -287,7 +302,7 @@ private:
 				secondCount * secondRayIntersectionCount;
 		}
 
-		if (type == RDHSAHBlend) {
+		if (type == RDHSAHBLEND) {
 			int firstRayIntersectionCount = 0;
 			int secondRayIntersectionCount = 0;
 
@@ -338,7 +353,7 @@ private:
 			return cost;
 		}
 
-		if (type == RDHSAHBlend) {
+		if (type == RDHSAHBLEND) {
 			int R = 0;  // Number of rays intersecting parent
 
 			for (int i = 0; i < rayDistribution.size(); i++)
