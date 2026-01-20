@@ -15,28 +15,6 @@ sceneGeometries scGeos;
 
 int main()
 {
-    glfwW.createGLFWContext();
-    if (glfwW.getWindow() == nullptr) return 1;
-    std::cout << "GLFW Context successfully created" << std::endl;
-
-    // Create imGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-    imGuiWrapper imGuiW = imGuiWrapper(io);
-    imGuiW.createImGuiContext(
-        glfwW.getWindow(), glfwW.getGlslVersion()
-    );
-
-    std::cout << "imGui Context successfully created" << std::endl;
-
-    // OpenGL
-    openGlW.compileShaders();
-    openGlW.createVertexBuffersAndAttributes();
-    openGlW.createScreenTexture();
-    std::cout << "OpenGL Context successfully created" << std::endl;
-
     // Init scene geometries
     scGeos.createBaseScene();
     scGeos.createTestScene();
@@ -65,19 +43,42 @@ int main()
     //RDHBvh.deserialize("BVHs/RDH-3-8.txt");
     //RDHSAHBlendBvh.deserialize("BVHs/RDHSAHBlended-3-8.txt");
     //OHBvh.deserialize("BVHs/OH-3");
+    
+    // Create windows, and API contexts
+    glfwW.createGLFWContext();
+    if (glfwW.getWindow() == nullptr) return 1;
+    std::cout << "GLFW Context successfully created" << std::endl;
+
+    // Create imGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    imGuiWrapper imGuiW = imGuiWrapper(io);
+    imGuiW.createImGuiContext(
+        glfwW.getWindow(), glfwW.getGlslVersion()
+    );
+
+    std::cout << "imGui Context successfully created" << std::endl;
+
+    // OpenGL
+    openGlW.compileShaders();
+    openGlW.createVertexBuffersAndAttributes();
+    openGlW.createScreenTexture();
+    std::cout << "OpenGL Context successfully created" << std::endl;
+
+    BVH& renderBvh = naiveBvh;
 
     // BVH render static
     /*
     float staticAngle = 270.0f;
     sc.spinCamera(staticAngle * M_PI / 180.0f);
-    sc.render(bvh);
+    sc.render(renderBvh);
     openGlW.setTextureIndex(3);
     glfwW.resizeGLFW();
     openGlW.render();
     glfwW.swapBuffers();
     */
-
-    BVH& renderBvh = naiveBvh;
 
     // BVH render spinning
     openGlW.setTextureIndex(3);
