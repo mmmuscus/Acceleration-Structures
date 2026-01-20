@@ -12,16 +12,22 @@ enum BVHType {
 	NAIVE,
 	SAH,
 	RDH,
-	RDHSAHBLEND
+	RDHSAHBLEND,
+	OH
 };
 
+// Class should be refactored into multiple different classes all inhereting from a base BVH class
 class BVH {
 private:
-	BVHType type;
 	unsigned int nodesUsed;
-
 	std::vector<BVHNode> nodes;
+
+	std::vector<unsigned int> primIdx;
+
+	BVHType type;
+
 	std::vector<ray> rayDistribution;
+	std::vector<unsigned int> visibilityMeasures;
 
 public:
 	BVH() {}
@@ -31,6 +37,12 @@ public:
 			BVHNode newNode;
 			nodes.push_back(newNode);
 		}
+
+		for (unsigned int i = 0; i < TRIANGLE_COUNT; i++) {
+			primIdx.push_back(i);
+			visibilityMeasures.push_back(0);
+		}
+			
 	}
 
 	void buildBVH(camera* cam = NULL, int numberOfViewpoints = 20, int patternSize = 4) {
@@ -43,7 +55,10 @@ public:
 		if (type == RDH || type == RDHSAHBLEND)
 			createRayDistribution(cam, numberOfViewpoints, patternSize);
 
-		subdivide(0);
+		if (type == OH)
+			createVisibilityMeasures(cam, numberOfViewpoints);
+
+		subdivide(0, 1);
 
 		if (type == NAIVE)
 			std::cout << "Naive BVH successfully built" << std::endl;
@@ -53,18 +68,18 @@ public:
 			std::cout << "RDH BVH successfully built" << std::endl;
 		if (type == RDHSAHBLEND)
 			std::cout << "RDH blended with SAH BVH successfully built" << std::endl;
+		if (type == OH)
+			std::cout << "OH BVH successfully built" << std::endl;
 	}
 
 	// Assumes that camera will always look at the origin
 	void createRayDistribution(camera* cam, int numberOfViewpoints, int patternSize) {
 		float angleStep = 2.0f * M_PI / (float)numberOfViewpoints; // 360.0f / numberOfViewpoints * M_PI / 180.0f;
 
-		std::cout << "START OF RAYDISTRIBUTION BUILDING" << std::endl;
+		for (int step = 0; step < numberOfViewpoints; step++) {
+			cam->spin(step * angleStep);
 
-		for (int i = 0; i < numberOfViewpoints; i++) {
-			cam->spin(i * angleStep);
-
-			std::cout << "Calculating rays for viewpoint number: " << i << std::endl;
+			std::cout << "Calculating rays for viewpoint number: " << step << std::endl;
 
 			for (int j = 0; j < HEIGHT; j += patternSize) { // ROWS
 				for (int i = 0; i < WIDTH; i += patternSize) { // COLUMNS
@@ -82,8 +97,49 @@ public:
 
 		// Reset camera
 		cam->spin(0.0f);
+	}
 
-		std::cout << "END OF RAYDISTRIBUTION BUILDING" << std::endl;
+	void createVisibilityMeasures(camera* cam, int numberOfViewpoints) {
+		float angleStep = 2.0f * M_PI / (float)numberOfViewpoints; // 360.0f / numberOfViewpoints * M_PI / 180.0f;
+		ray r;
+
+		for (int step = 0; step < numberOfViewpoints; step++) {
+			cam->spin(step * angleStep);
+			r.O = cam->getCam();
+
+			std::cout << "Calculating occlusion metrics for viewpoint number: " << step << std::endl;
+
+			for (int j = 0; j < HEIGHT; j++) { // ROWS
+				for (int i = 0; i < WIDTH; i++) { // COLUMNS
+					glm::vec3 pixelWorldPos = cam->getPixelWorldPos(j, i);
+
+					r.D = glm::normalize(pixelWorldPos - r.O);
+					r.t = 1e30f;
+
+					unsigned int lastPrimIdx = TRIANGLE_COUNT;
+
+					std::cout << "Casting ray: ( " << i << " , " << j << " )\n";
+
+					for (int n = 0; n < TRIANGLE_COUNT; n++) {
+						float lastIntersection = r.t;
+						prims[n].rayIntersection(r);
+
+						if (r.t < lastIntersection) {
+							std::cout << "New triangle found!" << std::endl;
+							if (lastPrimIdx != TRIANGLE_COUNT)
+								visibilityMeasures[lastPrimIdx]--;
+
+							if (visibilityMeasures[n] <= step)
+								visibilityMeasures[n]++;
+
+							lastPrimIdx = n;
+						}
+					}
+				}
+			}
+		}
+
+		cam->spin(0.0f);
 	}
 
 	void traverse(ray& r, unsigned int nodeIdx) {
@@ -144,7 +200,7 @@ public:
 	}
 
 private:
-	void subdivide(unsigned int nodeIdx) {
+	void subdivide(unsigned int nodeIdx, unsigned int depth) {
 		// Terminate recursion NAIVE
 		if (type == NAIVE && nodes[nodeIdx].primCount <= 3)
 			return;
@@ -164,8 +220,8 @@ private:
 			if (nodes[nodeIdx].primCount <= 1)
 				return;
 
-			splitCost = splitWithCost(nodeIdx, splitAxis, splitPosition);
-			parentCost = evaulateParentCost(curr);
+			splitCost = splitWithCost(nodeIdx, depth, splitAxis, splitPosition);
+			parentCost = evaulateParentCost(curr, depth);
 
 			if (splitCost > parentCost)
 				return;
@@ -179,10 +235,18 @@ private:
 				start++;
 			}
 			else {
-				// Ugly swap
+				// Ugly swap primitive
 				triangle temp = prims[end - 1];
 				prims[end - 1] = prims[start];
 				prims[start] = temp;
+
+				if (type == OH) {
+					// Ugly swap visibility measures
+					unsigned int temp = visibilityMeasures[end - 1];
+					visibilityMeasures[end - 1] = visibilityMeasures[start];
+					visibilityMeasures[start] = temp;
+				}
+
 				end--;
 			}
 		}
@@ -207,8 +271,8 @@ private:
 		curr.primCount = 0;
 
 		// Recurse
-		subdivide(leftIdx);
-		subdivide(rightIdx);
+		subdivide(leftIdx, depth + 1);
+		subdivide(rightIdx, depth + 1);
 	}
 
 	void splitNaive(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
@@ -231,7 +295,8 @@ private:
 		}
 	}
 
-	float splitWithCost(unsigned idx, unsigned int& splitAxis, float& splitPosition) {
+	// Depth only needs to be passed in case of OH, abstraction would help here
+	float splitWithCost(unsigned idx, unsigned int depth, unsigned int& splitAxis, float& splitPosition) {
 		BVHNode& curr = nodes[idx];
 		int bestAxis = -1;
 		float bestPos = 0;
@@ -242,7 +307,7 @@ private:
 				triangle& tri = prims[curr.leftFirst + i];
 				float candidatePos = tri.centroid[axis];
 				std::cout << "Evaulating candidate: " << i << " / " << curr.primCount << " for axis: " << axis << std::endl;
-				float cost = evaulateCost(curr, axis, candidatePos);
+				float cost = evaulateCost(curr, depth, axis, candidatePos);
 				if (cost < bestCost) {
 					bestPos = candidatePos;
 					bestAxis = axis;
@@ -256,10 +321,14 @@ private:
 		return bestCost;
 	}
 
-	float evaulateCost(BVHNode& curr, int axis, float pos) {
+	float evaulateCost(BVHNode& curr, unsigned int depth, int axis, float pos) {
 		AABB firstBox, secondBox;
 		int firstCount = 0;
 		int secondCount = 0;
+
+		// For Occlusion Heuristics
+		int firstVisible = 0;
+		int secondVisible = 0;
 
 		for (unsigned int i = 0; i < curr.primCount; i++) {
 			triangle& tri = prims[curr.leftFirst + i];
@@ -269,6 +338,9 @@ private:
 				firstBox.grow(tri.p0);
 				firstBox.grow(tri.p1);
 				firstBox.grow(tri.p2);
+
+				// For Occlusion Heuristics
+				firstVisible += visibilityMeasures[curr.leftFirst + i];
 			}
 			else
 			{
@@ -276,14 +348,17 @@ private:
 				secondBox.grow(tri.p0);
 				secondBox.grow(tri.p1);
 				secondBox.grow(tri.p2);
+
+				// For Occlusion Heuristics
+				secondVisible += visibilityMeasures[curr.leftFirst + i];
 			}
 		}
 
-		float cost = 0;
+		float cost = 1e30;
 
 		if (type == SAH)
 			cost = firstCount * firstBox.area() + secondCount * secondBox.area();
-		
+
 		if (type == RDH) {
 			int firstRayIntersectionCount = 0;
 			int secondRayIntersectionCount = 0;
@@ -315,7 +390,8 @@ private:
 			// Calculate SAH and RDH costs
 			float RDHCost = firstCount * firstRayIntersectionCount +
 				secondCount * secondRayIntersectionCount;
-			float SAHCost = firstCount * firstBox.area() + secondCount * secondBox.area();
+			float SAHCost = firstCount * firstBox.area() + 
+				secondCount * secondBox.area();
 
 			// Calculate blend weight
 			int R = 0; // Number of rays intersecting parent
@@ -331,13 +407,36 @@ private:
 			cost = w * RDHCost + (1.0f - w) * SAHCost;
 		}
 
+		if (type == OH) {
+			if (depth < (logf((float)TRIANGLE_COUNT) / 2)) {
+				float firstSAHRatio = (firstCount * firstBox.area()) /
+					(curr.primCount * curr.aabb.area());
+				float secondSAHRatio = (secondCount * secondBox.area()) /
+					(curr.primCount * curr.aabb.area());
+
+				float w = 0.9f;
+				float allVisible = (float)firstVisible + (float)secondVisible;
+
+				float firstOcclusionCost = firstCount *
+					((w * ((float)firstVisible / allVisible)) + ((1.0f - w) * firstSAHRatio));
+				float secondOcclusionCost = secondCount *
+					((w * ((float)secondVisible / allVisible)) + ((1.0f - w) * secondSAHRatio));
+
+				cost = firstOcclusionCost + secondOcclusionCost;
+			}
+			else {
+				cost = firstCount * firstBox.area() +
+					secondCount * secondBox.area();
+			}
+		}
+
 		if (cost > 0)
 			return cost;
 
 		return 1e30f;
 	}
 
-	float evaulateParentCost(BVHNode& curr) {
+	float evaulateParentCost(BVHNode& curr, unsigned int depth) {
 		if (type == SAH)
 			return curr.primCount * curr.aabb.area();
 
@@ -369,6 +468,13 @@ private:
 
 			// Final cost
 			return w * RDHCost + (1.0f - w) * SAHCost;
+		}
+
+		if (type == OH) { // Should not cause termination
+			if (depth < (logf((float)TRIANGLE_COUNT) / 2))
+				return (float)curr.primCount;
+			else
+				return curr.primCount * curr.aabb.area();
 		}
 
 		return 0;
