@@ -47,11 +47,11 @@ int main()
     BVH OHBvh = BVH(OH);
 
     // Build and serialize BVHs
-    //naiveBvh.buildAndSerialize("BVHs/naive.txt");
+    naiveBvh.buildAndSerialize("BVHs/naive.txt");
     //SAHBvh.buildAndSerialize("BVHs/SAH.txt");
-    RDHBvh.buildAndSerialize("BVHs/RDH-3-8.txt", sc.getCam(), 3, 8);
+    //RDHBvh.buildAndSerialize("BVHs/RDH-3-8.txt", sc.getCam(), 3, 8);
     //RDHSAHBlendBvh.buildAndSerialize("BVHs/RDHSAHBlended-3-8.txt", sc.getCam(), 3, 8);
-    //OHBvh.buildAndSerialize("BVHs/OH-3.txt", sc.getCam(), 3);
+    OHBvh.buildAndSerialize("BVHs/OH-3.txt", sc.getCam(), 3);
 
     // Deserialiaze BVHs
     //naiveBvh.deserialize("BVHs/naive.txt");
@@ -71,7 +71,7 @@ int main()
     glfwW.swapBuffers();
     */
 
-    BVH& renderBvh = RDHBvh;
+    BVH& renderBvh = OHBvh;
 
     // BVH render spinning
     openGlW.setTextureIndex(3);

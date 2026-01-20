@@ -30,6 +30,7 @@ private:
 	std::vector<ray> rayDistribution;
 	std::vector<bool> intersectedParent; // If corresponding ray from distribution intersected the parent
 	std::vector<unsigned int> visibilityMeasures;
+	std::vector<unsigned int> potentialPrimIdxs;
 
 	// Measurements for building BVH
 	unsigned int costEvals;
@@ -51,14 +52,14 @@ public:
 		}
 
 		primIdxSize = primIdx.size();
-			
+
 	}
 
 	void buildAndSerialize(
 		const std::string& filename,
 		camera* cam = NULL, int numberOfViewpoints = 20, int patternSize = 4
 	) {
- 		buildBVH(cam, numberOfViewpoints, patternSize);
+		buildBVH(cam, numberOfViewpoints, patternSize);
 		serialize(filename);
 	}
 
@@ -204,6 +205,12 @@ private:
 	}
 
 	void createVisibilityMeasures(camera* cam, int numberOfViewpoints) {
+		// build temporary bvh for speeding up creation of visibility measures:
+		BVH tempBvh = BVH(SAH);
+		tempBvh.buildBVH();
+
+		costEvals += tempBvh.costEvals;
+
 		float angleStep = 2.0f * M_PI / (float)numberOfViewpoints; // 360.0f / numberOfViewpoints * M_PI / 180.0f;
 		ray r;
 
@@ -222,20 +229,22 @@ private:
 					r.D = glm::normalize(pixelWorldPos - r.O);
 					r.t = 1e30f;
 
+					tempBvh.potentialPrimIdxs.clear();
+					tempBvh.traverseForOHConstruction(r, 0);
+
 					unsigned int lastPrimIdx = TRIANGLE_COUNT;
 
-					for (int n = 0; n < TRIANGLE_COUNT; n++) {
+					for (int n = 0; n < tempBvh.potentialPrimIdxs.size(); n++) {
 						float lastIntersection = r.t;
-						// Indirection not needed, array is still in initial order
-						prims[primIdx[n]].rayIntersection(r);
+						prims[tempBvh.potentialPrimIdxs[n]].rayIntersection(r);
 						primIntersectionCount++;
 
 						if (r.t < lastIntersection) {
 							if (lastPrimIdx != TRIANGLE_COUNT)
 								tempVisMeas[lastPrimIdx]--;
 
-							tempVisMeas[n]++;
-							lastPrimIdx = n;
+							tempVisMeas[tempBvh.potentialPrimIdxs[n]]++;
+							lastPrimIdx = tempBvh.potentialPrimIdxs[n];
 						}
 					}
 				}
@@ -247,7 +256,27 @@ private:
 			}
 		}
 
+		AABBIntersectionCount += tempBvh.AABBIntersectionCount;
 		cam->spin(0.0f);
+	}
+
+	void traverseForOHConstruction(ray& r, unsigned int nodeIdx) {
+		AABBIntersectionCount++;
+
+		BVHNode& curr = nodes[nodeIdx];
+
+		if (!curr.intersectAABB(r))
+			return;
+
+		if (curr.primCount != 0) {
+			for (int i = 0; i < curr.primCount; i++) {
+				potentialPrimIdxs.push_back(primIdx[curr.leftFirst + i]);
+			}
+		}
+		else {
+			traverseForOHConstruction(r, curr.leftFirst);
+			traverseForOHConstruction(r, curr.leftFirst + 1);
+		}
 	}
 
 	void subdivide(unsigned int nodeIdx, unsigned int depth) {
