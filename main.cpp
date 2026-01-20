@@ -55,7 +55,7 @@ int main()
 
     // Deserialiaze BVHs
     //naiveBvh.deserialize("BVHs/naive.txt");
-    SAHBvh.deserialize("BVHs/SAH.txt");
+    //SAHBvh.deserialize("BVHs/SAH.txt");
     //RDHBvh.deserialize("BVHs/RDH-3-8.txt");
     //RDHSAHBlendBvh.deserialize("BVHs/RDHSAHBlended-3-8.txt");
     //OHBvh.deserialize("BVHs/OH-3");
@@ -71,7 +71,7 @@ int main()
     glfwW.swapBuffers();
     */
 
-    BVH& renderBvh = SAHBvh;
+    BVH& renderBvh = RDHBvh;
 
     // BVH render spinning
     openGlW.setTextureIndex(3);

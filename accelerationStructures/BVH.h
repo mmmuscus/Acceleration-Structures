@@ -28,6 +28,7 @@ private:
 	BVHType type;
 
 	std::vector<ray> rayDistribution;
+	std::vector<bool> intersectedParent; // If corresponding ray from distribution intersected the parent
 	std::vector<unsigned int> visibilityMeasures;
 
 	// Measurements for building BVH
@@ -185,6 +186,7 @@ private:
 					newRay.t = 1e30f;
 
 					rayDistribution.push_back(newRay);
+					intersectedParent.push_back(false);
 				}
 			}
 		}
@@ -258,8 +260,14 @@ private:
 			if (nodes[nodeIdx].primCount <= 1)
 				return;
 
-			splitCost = splitWithCost(nodeIdx, depth, splitAxis, splitPosition);
-			parentCost = evaulateParentCost(curr, depth);
+			int R = 0;
+			if (type == RDHSAHBLEND || type == RDH) {
+				resetIntersectedParent();
+				R = calculateR(curr);
+			}
+
+			parentCost = evaulateParentCost(curr, depth, R);
+			splitCost = splitWithCost(nodeIdx, depth, splitAxis, splitPosition, R);
 
 			if (splitCost > parentCost)
 				return;
@@ -327,7 +335,11 @@ private:
 	}
 
 	// Depth only needs to be passed in case of OH, abstraction would help here
-	float splitWithCost(unsigned idx, unsigned int depth, unsigned int& splitAxis, float& splitPosition) {
+	float splitWithCost(
+		unsigned idx, unsigned int depth, 
+		unsigned int& splitAxis, float& splitPosition,
+		int R
+	) {
 		BVHNode& curr = nodes[idx];
 		int bestAxis = -1;
 		float bestPos = 0;
@@ -337,7 +349,7 @@ private:
 			for (unsigned int i = 0; i < curr.primCount; i++) {
 				triangle& tri = prims[primIdx[curr.leftFirst + i]];
 				float candidatePos = tri.centroid[axis];
-				float cost = evaulateCost(curr, depth, axis, candidatePos);
+				float cost = evaulateCost(curr, depth, axis, candidatePos, R);
 				if (cost < bestCost) {
 					bestPos = candidatePos;
 					bestAxis = axis;
@@ -351,7 +363,7 @@ private:
 		return bestCost;
 	}
 
-	float evaulateCost(BVHNode& curr, unsigned int depth, int axis, float pos) {
+	float evaulateCost(BVHNode& curr, unsigned int depth, int axis, float pos, int R) {
 		costEvals++;
 
 		AABB firstBox, secondBox;
@@ -396,13 +408,15 @@ private:
 			int secondRayIntersectionCount = 0;
 
 			for (int i = 0; i < rayDistribution.size(); i++) {
-				if (firstBox.intersect(rayDistribution[i]))
-					firstRayIntersectionCount++;
+				if (intersectedParent[i]) {
+					if (firstBox.intersect(rayDistribution[i]))
+						firstRayIntersectionCount++;
 
-				if (secondBox.intersect(rayDistribution[i]))
-					secondRayIntersectionCount++;
+					if (secondBox.intersect(rayDistribution[i]))
+						secondRayIntersectionCount++;
 
-				AABBIntersectionCount += 2;
+					AABBIntersectionCount += 2;
+				}
 			}
 
 			cost = firstCount * firstRayIntersectionCount +
@@ -414,13 +428,15 @@ private:
 			int secondRayIntersectionCount = 0;
 
 			for (int i = 0; i < rayDistribution.size(); i++) {
-				if (firstBox.intersect(rayDistribution[i]))
-					firstRayIntersectionCount++;
+				if (intersectedParent[i]) {
+					if (firstBox.intersect(rayDistribution[i]))
+						firstRayIntersectionCount++;
 
-				if (secondBox.intersect(rayDistribution[i]))
-					secondRayIntersectionCount++;
+					if (secondBox.intersect(rayDistribution[i]))
+						secondRayIntersectionCount++;
 
-				AABBIntersectionCount += 2;
+					AABBIntersectionCount += 2;
+				}
 			}
 
 			// Calculate SAH and RDH costs
@@ -430,12 +446,6 @@ private:
 				secondCount * secondBox.area();
 
 			// Calculate blend weight
-			int R = 0; // Number of rays intersecting parent
-			for (int i = 0; i < rayDistribution.size(); i++)
-				if (curr.intersectAABB(rayDistribution[i]))
-					R++;
-			AABBIntersectionCount += rayDistribution.size();
-
 			float alpha = 0.9f;
 			float beta = 0.1f;
 			float w = alpha * (1.0f - (1.0f / (1.0f + beta * (float)R)));
@@ -473,31 +483,16 @@ private:
 		return 1e30f;
 	}
 
-	float evaulateParentCost(BVHNode& curr, unsigned int depth) {
+	float evaulateParentCost(BVHNode& curr, unsigned int depth, int R) {
 		costEvals++;
 
 		if (type == SAH)
 			return curr.primCount * curr.aabb.area();
 
-		if (type == RDH) {
-			float cost = 0;
-
-			for (int i = 0; i < rayDistribution.size(); i++)
-				if (curr.intersectAABB(rayDistribution[i]))
-					cost += curr.primCount;
-			AABBIntersectionCount += rayDistribution.size();
-
-			return cost;
-		}
+		if (type == RDH) 
+			return R * curr.primCount;
 
 		if (type == RDHSAHBLEND) {
-			int R = 0;  // Number of rays intersecting parent
-
-			for (int i = 0; i < rayDistribution.size(); i++)
-				if (curr.intersectAABB(rayDistribution[i]))
-					R++;
-			AABBIntersectionCount += rayDistribution.size();
-
 			// Calculate SAH and RDH costs
 			float RDHCost = (float)R * curr.primCount;
 			float SAHCost = curr.primCount * curr.aabb.area();
@@ -519,6 +514,25 @@ private:
 		}
 
 		return 0;
+	}
+
+	int calculateR(BVHNode& curr) {
+		int R = 0;
+
+		for (int i = 0; i < rayDistribution.size(); i++)
+			if (curr.intersectAABB(rayDistribution[i])) {
+				R++;
+				intersectedParent[i] = true;
+			}
+
+		AABBIntersectionCount += rayDistribution.size();
+
+		return R;
+	}
+
+	void resetIntersectedParent() {
+		for (int i = 0; i < intersectedParent.size(); i++)
+			intersectedParent[i] = false;
 	}
 
 	void updateBounds(BVHNode& curr) {
