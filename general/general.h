@@ -31,7 +31,7 @@
 
 #include <random>
 
-#define EPSILON 0.000001f
+#define EPSILON 0.0001f
 
 std::random_device dev;
 std::mt19937 rng(dev());

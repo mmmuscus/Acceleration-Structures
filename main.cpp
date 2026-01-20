@@ -41,9 +41,9 @@ int main()
 
     // Build BVHs
     BVH naiveBvh = BVH(NAIVE);
-    //naiveBvh.buildBVH();
-    //naiveBvh.serialize("BVHs/naive.txt");
-    naiveBvh.deserialize("BVHs/naive.txt");
+    naiveBvh.buildBVH();
+    naiveBvh.serialize("BVHs/naive.txt");
+    //naiveBvh.deserialize("BVHs/naive.txt");
 
     BVH SAHBvh = BVH(SAH);
     //SAHBvh.buildBVH(sc.getCam());
@@ -66,7 +66,7 @@ int main()
     */
 
     // BVH render spinning
-    openGlW.setTextureIndex(3);
+    openGlW.setTextureIndex(0);
     for (angle = 0; angle < ANGLES; angle++) {
         std::cout << "Rendering scene with " << angle << " degree rotation around the y axis." << std::endl;
         sc.getCam()->spin((float)angle * M_PI / 180.0f);

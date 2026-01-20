@@ -122,13 +122,12 @@ public:
 		file.close();
 	}
 
-	BVH deserialize(const std::string& filename)
+	void deserialize(const std::string& filename)
 	{
-		BVH obj = BVH();
 		std::ifstream file(filename, std::ios::binary);
 		if (!file.is_open()) {
 			std::cout << "FAILED TO OPEN FILE" << std::endl;
-			return obj;
+			return;
 		}
 
 		file.read(reinterpret_cast<char*>(&type), sizeof(type));
@@ -137,12 +136,11 @@ public:
 		for (unsigned int i = 0; i < nodesUsed; i++) {
 			BVHNode newNode;
 			file.read(reinterpret_cast<char*>(&newNode), sizeof(newNode));
+
 			nodes[i] = newNode;
 		}
 
 		file.close();
-
-		return obj;
 	}
 
 private:
