@@ -22,6 +22,7 @@ private:
 	unsigned int nodesUsed;
 	std::vector<BVHNode> nodes;
 
+	unsigned int primIdxSize;
 	std::vector<unsigned int> primIdx;
 
 	BVHType type;
@@ -42,6 +43,8 @@ public:
 			primIdx.push_back(i);
 			visibilityMeasures.push_back(0);
 		}
+
+		primIdxSize = primIdx.size();
 			
 	}
 
@@ -105,6 +108,12 @@ public:
 			file.write(reinterpret_cast<const char*>(&nodes[i]), sizeof(nodes[i]));
 		}
 
+		file.write(reinterpret_cast<const char*>(&primIdxSize), sizeof(primIdxSize));
+
+		for (unsigned int i = 0; i < primIdxSize; i++) {
+			file.write(reinterpret_cast<const char*>(&primIdx[i]), sizeof(primIdx[i]));
+		}
+
 		file.close();
 	}
 
@@ -120,10 +129,13 @@ public:
 		file.read(reinterpret_cast<char*>(&nodesUsed), sizeof(nodesUsed));
 
 		for (unsigned int i = 0; i < nodesUsed; i++) {
-			BVHNode newNode;
-			file.read(reinterpret_cast<char*>(&newNode), sizeof(newNode));
+			file.read(reinterpret_cast<char*>(&nodes[i]), sizeof(nodes[i]));
+		}
 
-			nodes[i] = newNode;
+		file.read(reinterpret_cast<char*>(&primIdxSize), sizeof(primIdxSize));
+
+		for (unsigned int i = 0; i < primIdxSize; i++) {
+			file.read(reinterpret_cast<char*>(&primIdx[i]), sizeof(primIdx[i]));
 		}
 
 		file.close();
@@ -167,6 +179,10 @@ private:
 
 			std::cout << "Calculating occlusion metrics for viewpoint number: " << step << std::endl;
 
+			std::vector<unsigned int> tempVisMeas;
+			for (int i = 0; i < TRIANGLE_COUNT; i++)
+				tempVisMeas.push_back(0);
+
 			for (int j = 0; j < HEIGHT; j++) { // ROWS
 				for (int i = 0; i < WIDTH; i++) { // COLUMNS
 					glm::vec3 pixelWorldPos = cam->getPixelWorldPos(j, i);
@@ -180,20 +196,24 @@ private:
 
 					for (int n = 0; n < TRIANGLE_COUNT; n++) {
 						float lastIntersection = r.t;
-						prims[n].rayIntersection(r);
+						// Indirection not needed, array is still in initial order
+						prims[primIdx[n]].rayIntersection(r);
 
 						if (r.t < lastIntersection) {
 							std::cout << "New triangle found!" << std::endl;
 							if (lastPrimIdx != TRIANGLE_COUNT)
-								visibilityMeasures[lastPrimIdx]--;
+								tempVisMeas[lastPrimIdx]--;
 
-							if (visibilityMeasures[n] <= step)
-								visibilityMeasures[n]++;
-
+							tempVisMeas[n]++;
 							lastPrimIdx = n;
 						}
 					}
 				}
+			}
+
+			for (int n = 0; n < TRIANGLE_COUNT; n++) {
+				if (tempVisMeas[n] > 0)
+					visibilityMeasures[n]++;
 			}
 		}
 
@@ -235,17 +255,10 @@ private:
 				start++;
 			}
 			else {
-				// Ugly swap primitive
-				unsigned int temp = primIdx[end - 1];
-				primIdx[end - 1] = primIdx[start];
-				primIdx[start] = temp;
+				std::swap(primIdx[end - 1], primIdx[start]);
 
-				if (type == OH) {
-					// Ugly swap visibility measures
-					unsigned int temp = visibilityMeasures[end - 1];
-					visibilityMeasures[end - 1] = visibilityMeasures[start];
-					visibilityMeasures[start] = temp;
-				}
+				if (type == OH)
+					std::swap(visibilityMeasures[end - 1], visibilityMeasures[start]);
 
 				end--;
 			}
@@ -304,7 +317,7 @@ private:
 
 		for (unsigned int axis = 0; axis < 3; axis++) {
 			for (unsigned int i = 0; i < curr.primCount; i++) {
-				triangle& tri = prims[curr.leftFirst + i];
+				triangle& tri = prims[primIdx[curr.leftFirst + i]];
 				float candidatePos = tri.centroid[axis];
 				std::cout << "Evaulating candidate: " << i << " / " << curr.primCount << " for axis: " << axis << std::endl;
 				float cost = evaulateCost(curr, depth, axis, candidatePos);
@@ -331,7 +344,7 @@ private:
 		int secondVisible = 0;
 
 		for (unsigned int i = 0; i < curr.primCount; i++) {
-			triangle& tri = prims[curr.leftFirst + i];
+			triangle& tri = prims[primIdx[curr.leftFirst + i]];
 
 			if (tri.centroid[axis] < pos) {
 				firstCount++;
