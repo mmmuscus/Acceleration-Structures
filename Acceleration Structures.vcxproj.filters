@@ -110,6 +110,9 @@
     <ClInclude Include="rayTracer\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="rayTracer\sceneGeometries.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Acceleration Structures.slnx" />

@@ -4,12 +4,14 @@
 #include "general/openGlWrapper.h"
 
 #include "rayTracer/scene.h"
+#include "rayTracer/sceneGeometries.h"
 
 #include "accelerationStructures/BVH.h"
 
 glfwWrapper glfwW;
 openGlWrapper openGlW;
 scene sc(glm::vec3(0.0f, 0.0f, -18.0f));
+sceneGeometries scGeos;
 
 int main()
 {
@@ -35,8 +37,12 @@ int main()
     openGlW.createScreenTexture();
     std::cout << "OpenGL Context successfully created" << std::endl;
 
+    // Init scene geometries
+    scGeos.createBaseScene();
+    scGeos.createTestScene();
+
     // Init scene
-    sc.initScene();
+    sc.setSceneGeometry(scGeos.testScene);
     std::cout << "Scene successfully populated" << std::endl;
 
     // List of BVHs
@@ -51,7 +57,7 @@ int main()
     //SAHBvh.buildAndSerialize("BVHs/SAH.txt");
     //RDHBvh.buildAndSerialize("BVHs/RDH-3-8.txt", sc.getCam(), 3, 8);
     //RDHSAHBlendBvh.buildAndSerialize("BVHs/RDHSAHBlended-3-8.txt", sc.getCam(), 3, 8);
-    OHBvh.buildAndSerialize("BVHs/OH-3.txt", sc.getCam(), 3);
+    //OHBvh.buildAndSerialize("BVHs/OH-3.txt", sc.getCam(), 3);
 
     // Deserialiaze BVHs
     //naiveBvh.deserialize("BVHs/naive.txt");
@@ -71,7 +77,7 @@ int main()
     glfwW.swapBuffers();
     */
 
-    BVH& renderBvh = OHBvh;
+    BVH& renderBvh = naiveBvh;
 
     // BVH render spinning
     openGlW.setTextureIndex(3);

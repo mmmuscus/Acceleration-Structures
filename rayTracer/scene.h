@@ -19,8 +19,7 @@ public:
 
 	camera* getCam() { return cam; }
 
-	// Guided by: https://vulkan-tutorial.com/Loading_models
-	// Also by: https://github.com/canmom/rasteriser/blob/master/fileloader.cpp
+	
 	void initScene() {
 		std::cout << "Loading model started" << std::endl;
 		tinyobj::attrib_t attrib;
@@ -78,6 +77,12 @@ public:
 			}
 		}
 
+		TRIANGLE_COUNT = prims.size();
+	}
+
+	void setSceneGeometry(std::vector<triangle>& sceneToLoad) {
+		prims.clear();
+		prims = sceneToLoad;
 		TRIANGLE_COUNT = prims.size();
 	}
 
