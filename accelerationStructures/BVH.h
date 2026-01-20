@@ -218,6 +218,7 @@ private:
 						float lastIntersection = r.t;
 						// Indirection not needed, array is still in initial order
 						prims[primIdx[n]].rayIntersection(r);
+						primIntersectionCount++;
 
 						if (r.t < lastIntersection) {
 							if (lastPrimIdx != TRIANGLE_COUNT)
@@ -351,6 +352,8 @@ private:
 	}
 
 	float evaulateCost(BVHNode& curr, unsigned int depth, int axis, float pos) {
+		costEvals++;
+
 		AABB firstBox, secondBox;
 		int firstCount = 0;
 		int secondCount = 0;
@@ -398,6 +401,8 @@ private:
 
 				if (secondBox.intersect(rayDistribution[i]))
 					secondRayIntersectionCount++;
+
+				AABBIntersectionCount += 2;
 			}
 
 			cost = firstCount * firstRayIntersectionCount +
@@ -414,6 +419,8 @@ private:
 
 				if (secondBox.intersect(rayDistribution[i]))
 					secondRayIntersectionCount++;
+
+				AABBIntersectionCount += 2;
 			}
 
 			// Calculate SAH and RDH costs
@@ -427,6 +434,7 @@ private:
 			for (int i = 0; i < rayDistribution.size(); i++)
 				if (curr.intersectAABB(rayDistribution[i]))
 					R++;
+			AABBIntersectionCount += rayDistribution.size();
 
 			float alpha = 0.9f;
 			float beta = 0.1f;
@@ -466,6 +474,8 @@ private:
 	}
 
 	float evaulateParentCost(BVHNode& curr, unsigned int depth) {
+		costEvals++;
+
 		if (type == SAH)
 			return curr.primCount * curr.aabb.area();
 
@@ -475,6 +485,7 @@ private:
 			for (int i = 0; i < rayDistribution.size(); i++)
 				if (curr.intersectAABB(rayDistribution[i]))
 					cost += curr.primCount;
+			AABBIntersectionCount += rayDistribution.size();
 
 			return cost;
 		}
@@ -485,6 +496,7 @@ private:
 			for (int i = 0; i < rayDistribution.size(); i++)
 				if (curr.intersectAABB(rayDistribution[i]))
 					R++;
+			AABBIntersectionCount += rayDistribution.size();
 
 			// Calculate SAH and RDH costs
 			float RDHCost = (float)R * curr.primCount;
