@@ -22,8 +22,6 @@ int main()
     scGeos.createHighOcclusionSceneA();
     scGeos.createHighOcclusionSceneB();
 
-    sc.setSceneGeometry(scGeos.base);
-
     // List of BVHs
     BVH naiveBvh = BVH(NAIVE);
     BVH SAHBvh = BVH(SAH);
@@ -31,12 +29,103 @@ int main()
     BVH RDHSAHBlendBvh = BVH(RDHSAHBLEND);
     BVH OHBvh = BVH(OH);
 
-    // Build and serialize BVHs
-    naiveBvh.buildAndSerialize("BVHs/naive.txt");
-    //SAHBvh.buildAndSerialize("BVHs/SAH.txt");
-    //RDHBvh.buildAndSerialize("BVHs/RDH-3-8.txt", sc.getCam(), 3, 8);
-    //RDHSAHBlendBvh.buildAndSerialize("BVHs/RDHSAHBlended-3-8.txt", sc.getCam(), 3, 8);
-    //OHBvh.buildAndSerialize("BVHs/OH-3.txt", sc.getCam(), 3);
+    // naive and SAH for all scenes
+    sc.setSceneGeometry(scGeos.base);
+    naiveBvh.buildAndSerialize("BVHs/base_naive.txt");
+    SAHBvh.buildAndSerialize("BVHs/base_SAH.txt");
+    sc.setSceneGeometry(scGeos.lowOcclusionA);
+    naiveBvh = BVH(NAIVE);
+    SAHBvh = BVH(SAH);
+    naiveBvh.buildAndSerialize("BVHs/LOA_naive.txt");
+    SAHBvh.buildAndSerialize("BVHs/LOA_SAH.txt");
+    sc.setSceneGeometry(scGeos.lowOcclusionB);
+    naiveBvh = BVH(NAIVE);
+    SAHBvh = BVH(SAH);
+    naiveBvh.buildAndSerialize("BVHs/LOB_naive.txt");
+    SAHBvh.buildAndSerialize("BVHs/LOB_SAH.txt");
+    sc.setSceneGeometry(scGeos.highOcclusionA);
+    naiveBvh = BVH(NAIVE);
+    SAHBvh = BVH(SAH);
+    naiveBvh.buildAndSerialize("BVHs/HOA_naive.txt");
+    SAHBvh.buildAndSerialize("BVHs/HOA_SAH.txt");
+    sc.setSceneGeometry(scGeos.highOcclusionB);
+    BVH naiveBvh = BVH(NAIVE);
+    BVH SAHBvh = BVH(SAH);
+    naiveBvh.buildAndSerialize("BVHs/HOB_naive.txt");
+    SAHBvh.buildAndSerialize("BVHs/HOB_SAH.txt");
+    
+    // OHs for important scenes
+    sc.setSceneGeometry(scGeos.base);
+    OHBvh.buildAndSerialize("BVHs/base_OH-6.txt", sc.getCam(), 6);
+    OHBvh = BVH(OH);
+    OHBvh.buildAndSerialize("BVHs/base_OH-10.txt", sc.getCam(), 10);
+    OHBvh = BVH(OH);
+    OHBvh.buildAndSerialize("BVHs/base_OH-20.txt", sc.getCam(), 20);
+    sc.setSceneGeometry(scGeos.lowOcclusionA);
+    OHBvh.buildAndSerialize("BVHs/LOA_OH-6.txt", sc.getCam(), 6);
+    OHBvh = BVH(OH);
+    OHBvh.buildAndSerialize("BVHs/LOA_OH-10.txt", sc.getCam(), 10);
+    OHBvh = BVH(OH);
+    OHBvh.buildAndSerialize("BVHs/LOA_OH-20.txt", sc.getCam(), 20);
+    sc.setSceneGeometry(scGeos.highOcclusionA);
+    OHBvh.buildAndSerialize("BVHs/HOA_OH-6.txt", sc.getCam(), 6);
+    OHBvh = BVH(OH);
+    OHBvh.buildAndSerialize("BVHs/HOA_OH-10.txt", sc.getCam(), 10);
+    OHBvh = BVH(OH);
+    OHBvh.buildAndSerialize("BVHs/HOA_OH-20.txt", sc.getCam(), 20);
+
+    // Important RDHs for important scenes
+    sc.setSceneGeometry(scGeos.base);
+    RDHBvh.buildAndSerialize("BVHs/base_RDH-6-1.txt", sc.getCam(), 6, 1);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/base_RDH-6-4.txt", sc.getCam(), 6, 4);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/base_RDH-10-2.txt", sc.getCam(), 10, 2);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/base_RDH-20-20.txt", sc.getCam(), 20, 20);
+    RDHBvh = BVH(RDH);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/base_RDHSAHBlend-6-1.txt", sc.getCam(), 6, 1);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/base_RDHSAHBlend-6-4.txt", sc.getCam(), 6, 4);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/base_RDHSAHBlend-10-2.txt", sc.getCam(), 10, 2);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/base_RDHSAHBlend-20-20.txt", sc.getCam(), 20, 20);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    sc.setSceneGeometry(scGeos.lowOcclusionA);
+    RDHBvh.buildAndSerialize("BVHs/LOA_RDH-6-1.txt", sc.getCam(), 6, 1);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/LOA_RDH-6-4.txt", sc.getCam(), 6, 4);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/LOA_RDH-10-2.txt", sc.getCam(), 10, 2);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/LOA_RDH-20-20.txt", sc.getCam(), 20, 20);
+    RDHBvh = BVH(RDH);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/LOA_RDHSAHBlend-6-1.txt", sc.getCam(), 6, 1);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/LOA_RDHSAHBlend-6-4.txt", sc.getCam(), 6, 4);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/LOA_RDHSAHBlend-10-2.txt", sc.getCam(), 10, 2);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/LOA_RDHSAHBlend-20-20.txt", sc.getCam(), 20, 20);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    sc.setSceneGeometry(scGeos.highOcclusionA);
+    RDHBvh.buildAndSerialize("BVHs/HOA_RDH-6-1.txt", sc.getCam(), 6, 1);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/HOA_RDH-6-4.txt", sc.getCam(), 6, 4);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/HOA_RDH-10-2.txt", sc.getCam(), 10, 2);
+    RDHBvh = BVH(RDH);
+    RDHBvh.buildAndSerialize("BVHs/HOA_RDH-20-20.txt", sc.getCam(), 20, 20);
+    RDHBvh = BVH(RDH);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/HOA_RDHSAHBlend-6-1.txt", sc.getCam(), 6, 1);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/HOA_RDHSAHBlend-6-4.txt", sc.getCam(), 6, 4);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/HOA_RDHSAHBlend-10-2.txt", sc.getCam(), 10, 2);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
+    RDHSAHBlendBvh.buildAndSerialize("BVHs/HOA_RDHSAHBlend-20-20.txt", sc.getCam(), 20, 20);
+    RDHSAHBlendBvh = BVH(RDHSAHBLEND);
 
     // Deserialiaze BVHs
     //naiveBvh.deserialize("BVHs/naive.txt");
