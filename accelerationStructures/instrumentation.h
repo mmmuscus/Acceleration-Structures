@@ -43,6 +43,50 @@ void printMCSV() {
 	printMTraversalCSV();
 }
 
+void printBVHEval() {
+	float tAvgAvg = 0;
+	float tMaxAvg = 0;
+	float iAvgAvg = 0;
+	float iMaxAvg = 0;
+
+	int tAvgMax = 0;
+	int tMaxMax = 0;
+	int iAvgMax = 0;
+	int iMaxMax = 0;
+
+	for (int i = 0; i < ANGLES; i++) {
+		tAvgAvg += m[i].avg.traversalSteps;
+		tMaxAvg += m[i].max.traversalSteps;
+		iAvgAvg += m[i].avg.intersectionTests;
+		iMaxAvg += m[i].max.intersectionTests;
+
+		if (tAvgMax < m[i].avg.traversalSteps)
+			tAvgMax = m[i].avg.traversalSteps;
+
+		if (tMaxMax < m[i].max.traversalSteps)
+			tMaxMax = m[i].max.traversalSteps;
+
+		if (iAvgMax < m[i].avg.intersectionTests)
+			iAvgMax = m[i].avg.intersectionTests;
+
+		if (iMaxMax < m[i].max.intersectionTests)
+			iMaxMax = m[i].max.intersectionTests;
+	}
+
+	tAvgAvg /= (float)ANGLES;
+	tMaxAvg /= (float)ANGLES;
+	iAvgAvg /= (float)ANGLES;
+	iMaxAvg /= (float)ANGLES;
+
+	std::cout << "Intersection: " << std::endl;
+	std::cout << "avg of avg: " << iAvgAvg << " avg of max: " << iMaxAvg << std::endl;
+	std::cout << "max of avg: " << iAvgMax << " max of max: " << iMaxMax << std::endl;
+	std::cout << "Traversal: " << std::endl;
+	std::cout << "avg of avg: " << tAvgAvg << " avg of max: " << tMaxAvg << std::endl;
+	std::cout << "max of avg: " << tAvgMax << " max of max: " << tMaxMax << std::endl;
+	std::cout << std::endl;
+}
+
 class instrumentation {
 private:
 	unsigned int currentHeight;

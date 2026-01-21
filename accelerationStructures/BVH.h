@@ -38,6 +38,11 @@ private:
 	unsigned int primIntersectionCount;
 
 public:
+	BVH() 
+	{
+		reset();
+	}
+
 	BVH(BVHType _type) : type(_type), nodesUsed(1),
 		costEvals(0), AABBIntersectionCount(0), primIntersectionCount(0)
 	{
@@ -52,6 +57,14 @@ public:
 		}
 
 		primIdxSize = primIdx.size();
+	}
+
+	void reset() {
+		nodes.clear();
+		primIdx.clear();
+		visibilityMeasures.clear();
+
+		primIdxSize = 0;
 	}
 
 	void buildAndSerialize(
@@ -150,6 +163,8 @@ public:
 
 	void deserialize(const std::string& filename)
 	{
+		reset();
+
 		std::ifstream file(filename, std::ios::binary);
 		if (!file.is_open()) {
 			std::cout << "FAILED TO OPEN FILE" << std::endl;
@@ -160,13 +175,17 @@ public:
 		file.read(reinterpret_cast<char*>(&nodesUsed), sizeof(nodesUsed));
 
 		for (unsigned int i = 0; i < nodesUsed; i++) {
-			file.read(reinterpret_cast<char*>(&nodes[i]), sizeof(nodes[i]));
+			BVHNode newNode;
+			file.read(reinterpret_cast<char*>(&newNode), sizeof(newNode));
+			nodes.push_back(newNode);
 		}
 
 		file.read(reinterpret_cast<char*>(&primIdxSize), sizeof(primIdxSize));
 
 		for (unsigned int i = 0; i < primIdxSize; i++) {
-			file.read(reinterpret_cast<char*>(&primIdx[i]), sizeof(primIdx[i]));
+			unsigned int newPrimIdx;
+			file.read(reinterpret_cast<char*>(&newPrimIdx), sizeof(newPrimIdx));
+			primIdx.push_back(newPrimIdx);
 		}
 
 		file.read(reinterpret_cast<char*>(&costEvals), sizeof(costEvals));
