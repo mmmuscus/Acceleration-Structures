@@ -52,7 +52,6 @@ public:
 		}
 
 		primIdxSize = primIdx.size();
-
 	}
 
 	void buildAndSerialize(

@@ -115,6 +115,10 @@ public:
 					attrib.vertices[3 * indices[3 * face_ind + 2].vertex_index + 2]
 				);
 
+				prim.p0.y += 0.1f;
+				prim.p1.y += 0.1f;
+				prim.p2.y += 0.1f;
+
 				prim.calculateCentroid();
 
 				sphere.push_back(prim);
@@ -176,11 +180,12 @@ public:
 		std::cout << "Loading half sphere model" << std::endl;
 		for (int i = 0; i < sphere.size() / 2; i++) {
 			triangle prim = sphere[i];
-			float scaleFactor = 3.38f;
+			float scaleFactor = 13.0f;
 
 			prim.p0 *= scaleFactor;
 			prim.p1 *= scaleFactor;
 			prim.p2 *= scaleFactor;
+
 			prim.calculateCentroid();
 
 			halfSphere.push_back(prim);
@@ -196,7 +201,7 @@ public:
 
 	void createLowOcclusionSceneA() {
 		std::cout << "Creating low occlusion A scene" << std::endl;
-		int cubeSize = 4;
+		int cubeSize = 6;
 		float dist = 1.5f;
 		glm::vec3 corner = glm::vec3(
 			(dist / 2) + (cubeSize / -2.0f) * dist,
@@ -207,7 +212,7 @@ public:
 		std::vector<triangle> tempShpere;
 		for (int n = 0; n < sphere.size(); n++) {
 			triangle prim = sphere[n];
-			float scaleFactor = 0.3f;
+			float scaleFactor = 1.0f;
 
 			prim.p0 *= scaleFactor;
 			prim.p1 *= scaleFactor;
@@ -248,18 +253,18 @@ public:
 		}
 
 		// Create sphere grid
-		int cubeSize = 4;
-		float dist = 20.0f;
+		int cubeSize = 6;
+		float dist = 10.0f;
 		glm::vec3 corner = glm::vec3(
 			(dist / 2) + (cubeSize / -2.0f) * dist,
-			0.0f,
+			(dist / 2) + (cubeSize / -2.0f) * dist,
 			(dist / 2) + (cubeSize / -2.0f) * dist
 		);
 
 		std::vector<triangle> tempShpere;
 		for (int n = 0; n < sphere.size(); n++) {
 			triangle prim = sphere[n];
-			float scaleFactor = 2.0f;
+			float scaleFactor = 8.0f;
 
 			prim.p0 *= scaleFactor;
 			prim.p1 *= scaleFactor;
