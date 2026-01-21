@@ -8,10 +8,16 @@ struct step {
 	unsigned int traversalSteps; 
 };
 
+struct floatStep {
+	float intersectionTests;
+	float traversalSteps;
+};
+
 int angle;
 
 struct measurements {
-	step min, avg, max;
+	step min, max;
+	floatStep avg;
 };
 
 measurements m[ANGLES];
@@ -49,9 +55,9 @@ void printBVHEval() {
 	float iAvgAvg = 0;
 	float iMaxAvg = 0;
 
-	int tAvgMax = 0;
+	float tAvgMax = 0;
 	int tMaxMax = 0;
-	int iAvgMax = 0;
+	float iAvgMax = 0;
 	int iMaxMax = 0;
 
 	for (int i = 0; i < ANGLES; i++) {
@@ -79,12 +85,14 @@ void printBVHEval() {
 	iMaxAvg /= (float)ANGLES;
 
 	std::cout << "Intersection: " << std::endl;
-	std::cout << "avg of avg: " << iAvgAvg << " avg of max: " << iMaxAvg << std::endl;
-	std::cout << "max of avg: " << iAvgMax << " max of max: " << iMaxMax << std::endl;
-	std::cout << "Traversal: " << std::endl;
-	std::cout << "avg of avg: " << tAvgAvg << " avg of max: " << tMaxAvg << std::endl;
-	std::cout << "max of avg: " << tAvgMax << " max of max: " << tMaxMax << std::endl;
-	std::cout << std::endl;
+	printf("AoAI: %.2f\n", iAvgAvg);
+	printf("AoMI: %.2f\n", iMaxAvg);
+	printf("MoAI: %.2f\n", iAvgMax);
+	printf("MoMI: %d\n", iMaxMax);
+	printf("AoAT: %.2f\n", tAvgAvg);
+	printf("MoAT: %.2f\n", tMaxAvg);
+	printf("AoMT: %.2f\n", tAvgMax);
+	printf("MoMT: %d\n\n", tMaxMax);
 }
 
 class instrumentation {
@@ -93,14 +101,16 @@ private:
 	unsigned int currentWidth;
 
 	step steps[HEIGHT][WIDTH];
-	step min, avg, max;
+	step min, max;
+	floatStep avgSteps[HEIGHT][WIDTH];
+	floatStep avg;
 
 	glm::vec3 startColor;
 	glm::vec3 endColor;
 
 public:
 	instrumentation() : currentHeight(0), currentWidth(0),
-		min(0), avg(0), max(0),
+		min(0), avg(0.0f), max(0),
 		startColor(glm::vec3( // Used when min value
 			0.0f, 0.0f, 0.0f
 		)),
@@ -159,8 +169,8 @@ public:
 			}
 		}
 
-		avg.traversalSteps = traversalStepSum / (WIDTH * HEIGHT);
-		avg.intersectionTests = intersectionTestsSum / (WIDTH * HEIGHT);
+		avg.traversalSteps = (float)traversalStepSum / (float)(WIDTH * HEIGHT);
+		avg.intersectionTests = (float)intersectionTestsSum / (float)(WIDTH * HEIGHT);
 
 		// Update plot values
 		m[angle].min = min;
