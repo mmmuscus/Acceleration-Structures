@@ -17,11 +17,12 @@ int main()
 {
     // Init scene geometries
     scGeos.createBaseScene();
-    scGeos.createTestScene();
+    scGeos.createLowOcclusionSceneA();
+    scGeos.createLowOcclusionSceneB();
+    scGeos.createHighOcclusionSceneA();
+    scGeos.createHighOcclusionSceneB();
 
-    // Init scene
-    sc.setSceneGeometry(scGeos.baseScene);
-    std::cout << "Scene successfully populated" << std::endl;
+    sc.setSceneGeometry(scGeos.base);
 
     // List of BVHs
     BVH naiveBvh = BVH(NAIVE);
@@ -43,6 +44,10 @@ int main()
     //RDHBvh.deserialize("BVHs/RDH-3-8.txt");
     //RDHSAHBlendBvh.deserialize("BVHs/RDHSAHBlended-3-8.txt");
     //OHBvh.deserialize("BVHs/OH-3");
+
+    // Init scene
+    sc.setSceneGeometry(scGeos.highOcclusionB);
+    std::cout << "Scene successfully populated" << std::endl;
     
     // Create windows, and API contexts
     glfwW.createGLFWContext();
